@@ -26,14 +26,31 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="衣物类别" prop="category">
-                      <el-input
-                          v-model="queryParams.category"
-                          placeholder="衣物类别"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="衣物类别" prop="category">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.category"-->
+<!--                          placeholder="衣物类别"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+                    <el-form-item label="衣物类别" prop="category">
+                      <el-select
+                        v-model="queryParams.category"
+                        placeholder="衣物类别"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in categoryOptions"
+                          :key="Number(item.value)"
+                          :label="item.label"
+                          :value="Number(item.value)"
+                        />
+                      </el-select>
+                    </el-form-item>
+
                 <el-form-item label="特殊处理要求" prop="specialRequirements">
                       <el-input
                           v-model="queryParams.specialRequirements"
@@ -42,14 +59,31 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="是否精细衣物" prop="isDelicate">
-                      <el-input
-                          v-model="queryParams.isDelicate"
-                          placeholder="是否精细衣物"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="是否精细衣物" prop="isDelicate">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.isDelicate"-->
+<!--                          placeholder="是否精细衣物"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+                    <el-form-item label="是否精细衣物" prop="isDelicate">
+                      <el-select
+                        v-model="queryParams.isDelicate"
+                        placeholder="是否精细衣物"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in isDelicateOptions"
+                          :key="Number(item.value)"
+                          :label="item.label"
+                          :value="Number(item.value)"
+                        />
+                      </el-select>
+                    </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="handleQuery">
             <template #icon><Search /></template>
@@ -114,13 +148,24 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="category"-->
+<!--                        label="衣物类别"-->
+<!--                        prop="category"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="category"
-                        label="衣物类别"
-                        prop="category"
-                        min-width="150"
-                        align="center"
-                    />
+                      label="衣物类别"
+                      min-width="150"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <DictLabel v-model="scope.row.category" code="laundry_clothing_type_category" />
+                      </template>
+                    </el-table-column>
+
                     <el-table-column
                         key="basePrice"
                         label="基础价格"
@@ -142,20 +187,42 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="isDelicate"-->
+<!--                        label="是否精细衣物"-->
+<!--                        prop="isDelicate"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="isDelicate"
-                        label="是否精细衣物"
-                        prop="isDelicate"
-                        min-width="150"
-                        align="center"
-                    />
-                    <el-table-column
-                        key="status"
+                      label="是否精细衣物"
+                      min-width="150"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <DictLabel v-model="scope.row.isDelicate" code="laundry_clothing_type_is_delicate" />
+                      </template>
+                    </el-table-column>
+
+<!--                    <el-table-column-->
+<!--                        key="status"-->
+<!--                        label="状态"-->
+<!--                        prop="status"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
+                      <el-table-column
                         label="状态"
-                        prop="status"
                         min-width="150"
                         align="center"
-                    />
+                      >
+                        <template #default="scope">
+                          <DictLabel v-model="scope.row.status" code="laundry_clothing_type_status" />
+                        </template>
+                      </el-table-column>
+
                     <el-table-column
                         key="createTime"
                         label="创建时间"
@@ -213,12 +280,12 @@
         @close="handleCloseDialog"
     >
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
-                <el-form-item label="类型代码" prop="typeCode">
-                      <el-input
-                          v-model="formData.typeCode"
-                          placeholder="类型代码"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="类型代码" prop="typeCode">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.typeCode"-->
+<!--                          placeholder="类型代码"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
                 <el-form-item label="类型名称" prop="typeName">
                       <el-input
@@ -227,12 +294,29 @@
                       />
                 </el-form-item>
 
-                <el-form-item label="衣物类别" prop="category">
-                      <el-input
-                          v-model="formData.category"
-                          placeholder="衣物类别"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="衣物类别" prop="category">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.category"-->
+<!--                          placeholder="衣物类别"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="衣物类别" prop="category">
+                      <el-select
+                        v-model="formData.category"
+                        placeholder="衣物类别"
+                        clearable
+                        filterable
+                      >
+                        <el-option
+                          v-for="item in categoryOptions"
+                          :key="Number(item.value)"
+                          :label="item.label"
+                          :value="Number(item.value)"
+                        />
+                      </el-select>
+                    </el-form-item>
+
 
                 <el-form-item label="基础价格" prop="basePrice">
                       <el-input
@@ -252,22 +336,55 @@
                       <el-input
                           v-model="formData.specialRequirements"
                           placeholder="特殊处理要求"
+                          type="textarea"
                       />
                 </el-form-item>
 
-                <el-form-item label="是否精细" prop="isDelicate">
-                      <el-input
-                          v-model="formData.isDelicate"
-                          placeholder="是否精细衣物"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="是否精细" prop="isDelicate">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.isDelicate"-->
+<!--                          placeholder="是否精细衣物"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
-                <el-form-item label="状态" prop="status">
-                      <el-input
-                          v-model="formData.status"
-                          placeholder="状态"
-                      />
-                </el-form-item>
+                    <el-form-item label="是否精细" prop="isDelicate">
+                      <el-select
+                        v-model="formData.isDelicate"
+                        placeholder="是否精细衣物"
+                        clearable
+                        filterable
+                      >
+                        <el-option
+                          v-for="item in isDelicateOptions"
+                          :key="Number(item.value)"
+                          :label="item.label"
+                          :value="Number(item.value)"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+<!--                <el-form-item label="状态" prop="status">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.status"-->
+<!--                          placeholder="状态"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="状态" prop="status">
+                      <el-select
+                        v-model="formData.status"
+                        placeholder="状态"
+                        clearable
+                        filterable
+                      >
+                        <el-option
+                          v-for="item in statusOptions"
+                          :key="Number(item.value)"
+                          :label="item.label"
+                          :value="Number(item.value)"
+                        />
+                      </el-select>
+                    </el-form-item>
 
       </el-form>
       <template #footer>
@@ -287,7 +404,8 @@
   });
 
   import AioveuLaundryClothingTypeAPI, { AioveuLaundryClothingTypePageVO, AioveuLaundryClothingTypeForm, AioveuLaundryClothingTypePageQuery } from "@/api/aioveuLaundryClothingType/aioveu-laundry-clothing-type";
-
+  // 导入字典值
+  import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
   const queryFormRef = ref();
   const dataFormRef = ref();
 
@@ -302,6 +420,27 @@
 
   // 衣物类型表格数据
   const pageData = ref<AioveuLaundryClothingTypePageVO[]>([]);
+  // 状态选项
+  const isDelicateOptions = ref<DictItemOption[]>([])
+  const categoryOptions = ref<DictItemOption[]>([])
+  const statusOptions = ref<DictItemOption[]>([])
+
+
+  // 状态字典
+  function loadOptions() {
+    DictAPI.getDictItems('laundry_clothing_type_is_delicate').then(response => {
+      isDelicateOptions.value = response
+    })
+
+    DictAPI.getDictItems('laundry_clothing_type_category').then(response => {
+      categoryOptions.value = response
+    })
+
+    DictAPI.getDictItems('laundry_clothing_type_status').then(response => {
+      statusOptions.value = response
+    })
+
+  }
 
   // 弹窗
   const dialog = reactive({
@@ -316,7 +455,7 @@
   const rules = reactive({
                       typeCode: [{ required: true, message: "请输入类型代码", trigger: "blur" }],
                       typeName: [{ required: true, message: "请输入类型名称", trigger: "blur" }],
-                      category: [{ required: true, message: "请输入衣物类别,0-上装-top,1-下装-bottom,2-外套-outerwear,3-内衣-underwear,4-配饰-accessories,5-家居用品-home,6-特殊衣物-special", trigger: "blur" }],
+                      category: [{ required: true, message: "请输入衣物类别", trigger: "blur" }],
                       processingTime: [{ required: true, message: "请输入标准处理时间(分钟)", trigger: "blur" }],
                       isDelicate: [{ required: true, message: "请输入是否精细衣物", trigger: "blur" }],
                       status: [{ required: true, message: "请输入状态(0-停用 1-启用)", trigger: "blur" }],
@@ -349,14 +488,20 @@
 
   /** 打开衣物类型弹窗 */
   function handleOpenDialog(id?: number) {
-    dialog.visible = true;
+    // dialog.visible = true;
     if (id) {
       dialog.title = "修改衣物类型";
             AioveuLaundryClothingTypeAPI.getFormData(id).then((data) => {
         Object.assign(formData, data);
+              //先准备数据，再显示弹窗
+              dialog.visible = true;
       });
     } else {
       dialog.title = "新增衣物类型";
+      // 直接打开弹窗
+      dialog.visible = true;
+      // 重置清空表单
+      dataFormRef.value.resetFields();
     }
   }
 
@@ -425,5 +570,6 @@
 
   onMounted(() => {
     handleQuery();
+    loadOptions()
   });
 </script>

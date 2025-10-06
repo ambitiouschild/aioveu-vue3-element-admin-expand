@@ -33,7 +33,7 @@ const AioveuLaundryClothingTypeAPI = {
         return request({
             url: `${AIOVEULAUNDRYCLOTHINGTYPE_BASE_URL}`,
             method: "post",
-            data: data,
+            data,
         });
     },
 
@@ -47,7 +47,7 @@ const AioveuLaundryClothingTypeAPI = {
         return request({
             url: `${AIOVEULAUNDRYCLOTHINGTYPE_BASE_URL}/${id}`,
             method: "put",
-            data: data,
+            data,
         });
     },
 
@@ -61,7 +61,26 @@ const AioveuLaundryClothingTypeAPI = {
             url: `${AIOVEULAUNDRYCLOTHINGTYPE_BASE_URL}/${ids}`,
             method: "delete",
         });
+    },
+    /**
+     * 获取所有选项列表（用于下拉选择框）
+     * @returns 选项列表
+     * 因为request函数的类型定义允许第一个类型参数为any，从而绕过了类型检查
+     */
+    getAllLaundryClothingTypeOptions() {
+      return request<any,AioveuLaundryClothingTypeOptionVO[]>({
+        url: `${AIOVEULAUNDRYCLOTHINGTYPE_BASE_URL}/options`,
+        method: "get",
+      });
     }
+}
+
+/** 选项VO（用于下拉选择框） */
+export interface AioveuLaundryClothingTypeOptionVO {
+  /** ID */
+  clothingTypeId: number;
+  /** 名称 */
+  clothingTypeName: string;
 }
 
 export default AioveuLaundryClothingTypeAPI;
@@ -84,6 +103,8 @@ export interface AioveuLaundryClothingTypePageQuery extends PageQuery {
 
 /** 衣物类型表单对象 */
 export interface AioveuLaundryClothingTypeForm {
+  /** 衣物类型ID */
+  id?:  number;
     /** 类型代码 */
     typeCode?:  string;
     /** 类型名称 */

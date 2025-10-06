@@ -33,7 +33,7 @@ const AioveuLaundryOrderItemAPI = {
         return request({
             url: `${AIOVEULAUNDRYORDERITEM_BASE_URL}`,
             method: "post",
-            data: data,
+            data,
         });
     },
 
@@ -47,7 +47,7 @@ const AioveuLaundryOrderItemAPI = {
         return request({
             url: `${AIOVEULAUNDRYORDERITEM_BASE_URL}/${id}`,
             method: "put",
-            data: data,
+            data,
         });
     },
 
@@ -84,6 +84,8 @@ export interface AioveuLaundryOrderItemPageQuery extends PageQuery {
 
 /** 洗衣订单衣物明细表单对象 */
 export interface AioveuLaundryOrderItemForm {
+  /** 洗衣订单衣物明细ID */
+  id?:  number;
     /** 订单ID */
     orderId?:  number;
     /** 衣物类型ID */

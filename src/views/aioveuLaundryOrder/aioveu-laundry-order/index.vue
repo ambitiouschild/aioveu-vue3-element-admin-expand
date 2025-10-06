@@ -18,18 +18,36 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="会员ID" prop="memberId">
-                      <el-input
-                          v-model="queryParams.memberId"
-                          placeholder="会员ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
-                <el-form-item label="客户姓名" prop="customerName">
+<!--                <el-form-item label="会员ID" prop="memberId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.memberId"-->
+<!--                          placeholder="会员ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="会员卡号" prop="memberId">
+                      <el-select
+                        v-model="queryParams.memberId"
+                        placeholder="请选择会员卡号"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="memberOption in aioveuMemberOption"
+                          :key="memberOption.memberId"
+                          :label="memberOption.memberNo"
+                          :value="memberOption.memberId"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+                <el-form-item label="非会员客户姓名" prop="customerName">
                       <el-input
                           v-model="queryParams.customerName"
-                          placeholder="客户姓名"
+                          placeholder="非会员客户姓名"
                           clearable
                           @keyup.enter="handleQuery()"
                       />
@@ -143,13 +161,22 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="memberId"-->
+<!--                        label="会员ID"-->
+<!--                        prop="memberId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="memberId"
-                        label="会员ID"
-                        prop="memberId"
-                        min-width="150"
-                        align="center"
+                      key="memberNo"
+                      label="会员卡号"
+                      prop="memberNo"
+                      min-width="150"
+                      align="center"
                     />
+
                     <el-table-column
                         key="customerName"
                         label="客户姓名"
@@ -313,34 +340,86 @@
         @close="handleCloseDialog"
     >
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
-                <el-form-item label="订单号" prop="orderNo">
-                      <el-input
-                          v-model="formData.orderNo"
-                          placeholder="订单号"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="订单号" prop="orderNo">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.orderNo"-->
+<!--                          placeholder="订单号"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
-                <el-form-item label="会员ID" prop="memberId">
-                      <el-input
-                          v-model="formData.memberId"
-                          placeholder="会员ID"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="会员ID" prop="memberId">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.memberId"-->
+<!--                          placeholder="会员ID"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+        <template v-if="dialog.type === 'edit'">
 
-                <el-form-item label="客户姓名" prop="customerName">
-                      <el-input
-                          v-model="formData.customerName"
-                          placeholder="客户姓名"
-                      />
-                </el-form-item>
+                    <el-form-item label="订单号" prop="orderNo">
+                          <el-input
+                              v-model="formData.orderNo"
+                              placeholder="订单号"
+                              disabled
+                          >
+                            <template #prefix>
+                              <el-icon><lock /></el-icon>
+                            </template>
+                          </el-input>
+                    </el-form-item>
 
-                <el-form-item label="客户电话" prop="customerPhone">
-                      <el-input
-                          v-model="formData.customerPhone"
-                          placeholder="客户电话"
-                      />
-                </el-form-item>
+                    <el-form-item label="会员卡号" prop="memberId">
+                      <el-select
+                        v-model="formData.memberId"
+                        placeholder="非会员"
+                        clearable
+                        filterable
+                        disabled
+                      >
+                        <template #prefix>
+                          <el-icon><lock /></el-icon>
+                        </template>
+                        <el-option
+                          v-for="item in aioveuMemberOption"
+                          :key="item .memberId"
+                          :label="item .memberNo"
+                          :value="item .memberId"
+                        />
+                      </el-select>
+                    </el-form-item>
+        </template>
+        <!-- 新增操作字段 -->
+        <template v-else>
+          <el-form-item label="会员卡号" prop="memberId">
+            <el-select
+              v-model="formData.memberId"
+              placeholder="请选择会员卡号"
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="item in aioveuMemberOption"
+                :key="item .memberId"
+                :label="item .memberNo"
+                :value="item .memberId"
+              />
+            </el-select>
+          </el-form-item>
 
+        </template>
+
+                    <el-form-item label="客户姓名" prop="customerName">
+                      <el-input
+                        v-model="formData.customerName"
+                        placeholder="客户姓名"
+                      />
+                    </el-form-item>
+
+                    <el-form-item label="客户电话" prop="customerPhone">
+                      <el-input
+                        v-model="formData.customerPhone"
+                        placeholder="客户电话"
+                      />
+                    </el-form-item>
 <!--                <el-form-item label="订单状态" prop="status">-->
 <!--                      <el-input-->
 <!--                          v-model="formData.status"-->
@@ -385,19 +464,34 @@
                       />
                 </el-form-item>
 
-                <el-form-item label="支付状态">
-                      <el-input
-                          v-model="formData.paymentStatus"
-                          placeholder="支付状态"
-                      />
+<!--                <el-form-item label="支付状态">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.paymentStatus"-->
+<!--                          placeholder="支付状态"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                <el-form-item label="支付状态" prop="paymentStatus">
+                  <el-select
+                    v-model="formData.paymentStatus"
+                    placeholder="支付状态"
+                    clearable
+                  >
+                    <el-option
+                      v-for="item in laundry_order_payment_status_Options"
+                      :key="Number(item.value)"
+                      :label="item.label"
+                      :value="Number(item.value)"
+                    />
+                  </el-select>
                 </el-form-item>
 
-                <el-form-item label="支付方式ID" prop="paymentMethodId">
-                      <el-input
-                          v-model="formData.paymentMethodId"
-                          placeholder="支付方式ID"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="支付方式ID" prop="paymentMethodId">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.paymentMethodId"-->
+<!--                          placeholder="支付方式ID"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
                 <el-form-item label="收衣时间" prop="receiveTime">
                       <el-date-picker
@@ -430,6 +524,7 @@
                       <el-input
                           v-model="formData.remark"
                           placeholder="备注"
+                          type="textarea"
                       />
                 </el-form-item>
 
@@ -451,11 +546,12 @@
   });
 
   import AioveuLaundryOrderAPI, { AioveuLaundryOrderPageVO, AioveuLaundryOrderForm, AioveuLaundryOrderPageQuery } from "@/api/aioveuLaundryOrder/aioveu-laundry-order";
-
+  import AioveuMemberAPI, { AioveuMemberOptionVO } from "@/api/aioveuMember/aioveu-member";
 
   // 导入字典值
   import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
-
+  // 新增：选项
+  const aioveuMemberOption = ref<AioveuMemberOptionVO[]>([]);
   // 状态选项
   const laundry_order_status_Options = ref<DictItemOption[]>([])
 
@@ -495,6 +591,7 @@
   // 弹窗
   const dialog = reactive({
     title: "",
+    type: " ",// 'recharge', 'add', 'edit'
     visible: false,
   });
 
@@ -503,8 +600,8 @@
 
   // 洗衣订单表单校验规则
   const rules = reactive({
-                      orderNo: [{ required: true, message: "请输入订单号", trigger: "blur" }],
-                      memberId: [{ required: true, message: "请输入会员ID", trigger: "blur" }],
+                      // orderNo: [{ required: true, message: "请输入订单号", trigger: "blur" }],
+                      // memberId: [{ required: true, message: "请输入会员ID", trigger: "blur" }],
                       status: [{ required: true, message: "请输入订单状态", trigger: "blur" }],
                       totalAmount: [{ required: true, message: "请输入订单总额", trigger: "blur" }],
                       discountAmount: [{ required: true, message: "请输入折扣金额", trigger: "blur" }],
@@ -540,14 +637,22 @@
 
   /** 打开洗衣订单弹窗 */
   function handleOpenDialog(id?: number) {
-    dialog.visible = true;
+    // dialog.visible = true;
     if (id) {
       dialog.title = "修改洗衣订单";
+      dialog.type = 'edit'; // 标记为编辑操作
             AioveuLaundryOrderAPI.getFormData(id).then((data) => {
         Object.assign(formData, data);
+              //先准备数据，再显示弹窗
+              dialog.visible = true;
       });
     } else {
       dialog.title = "新增洗衣订单";
+      dialog.type = 'add'; // 标记为新增操作
+      //直接打开弹窗
+      dialog.visible = true;
+      // 新增操作重置清空表单
+      dataFormRef.value.resetFields();
     }
   }
 
@@ -613,10 +718,17 @@
         }
     );
   }
-
+  // 主要修改点：选项加载方法
+  function loadAioveuMemberOptionVO() {
+    AioveuMemberAPI.getAllMemberNoOptions().then(response => {
+      aioveuMemberOption.value = response
+    })
+  }
   onMounted(() => {
     handleQuery();
     load_laundry_order_status_Options()
     load_laundry_order_payment_status_Options()
+    //在 onMounted钩子中调用了 loadAioveuMemberOptionVO()函数,确保函数被正确使用
+    loadAioveuMemberOptionVO();
   });
 </script>

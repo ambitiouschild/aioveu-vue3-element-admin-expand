@@ -18,14 +18,32 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="会员ID" prop="memberId">
-                      <el-input
-                          v-model="queryParams.memberId"
-                          placeholder="会员ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="会员ID" prop="memberId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.memberId"-->
+<!--                          placeholder="会员ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+                    <el-form-item label="会员卡号" prop="memberId">
+                      <el-select
+                        v-model="queryParams.memberId"
+                        placeholder="请选择会员卡号"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="memberOption in aioveuMemberOption"
+                          :key="memberOption.memberId"
+                          :label="memberOption.memberNo"
+                          :value="memberOption.memberId"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+
 <!--                <el-form-item label="支付方式" prop="paymentType">-->
 <!--                      <el-input-->
 <!--                          v-model="queryParams.paymentType"-->
@@ -121,12 +139,28 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="memberId"-->
+<!--                        label="会员ID"-->
+<!--                        prop="memberId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="memberId"
-                        label="会员ID"
-                        prop="memberId"
-                        min-width="150"
-                        align="center"
+                      key="memberNo"
+                      label="会员卡号"
+                      prop="memberNo"
+                      min-width="150"
+                      align="center"
+                    />
+
+                    <el-table-column
+                      key="name"
+                      label="会员姓名"
+                      prop="name"
+                      min-width="150"
+                      align="center"
                     />
                     <el-table-column
                         key="amount"
@@ -263,13 +297,48 @@
 <!--                          placeholder="充值单号"-->
 <!--                      />-->
 <!--                </el-form-item>-->
-                <!-- 公共字段 -->
-                <el-form-item label="会员ID" prop="memberId">
-                      <el-input
+                    <!-- 编辑特有字段 -->
+                    <template v-if="dialog.type === 'edit'">
+                      <el-form-item label="会员卡号" prop="memberId">
+                        <el-select
                           v-model="formData.memberId"
-                          placeholder="会员ID"
-                      />
-                </el-form-item>
+                          placeholder="请选择会员卡号"
+                          clearable
+                          filterable
+                          disabled
+                        >
+                          <template #prefix>
+                            <el-icon><lock /></el-icon>
+                          </template>
+                          <el-option
+                            v-for="item in aioveuMemberOption"
+                            :key="item .memberId"
+                            :label="item .memberNo"
+                            :value="item .memberId"
+                          />
+                        </el-select>
+                      </el-form-item>
+                    </template>
+
+                    <!-- 新增操作字段 -->
+                    <template v-else>
+                      <el-form-item label="会员卡号" prop="memberId">
+                        <el-select
+                          v-model="formData.memberId"
+                          placeholder="请选择会员卡号"
+                          clearable
+                          filterable
+                        >
+                          <el-option
+                            v-for="item in aioveuMemberOption"
+                            :key="item .memberId"
+                            :label="item .memberNo"
+                            :value="item .memberId"
+                          />
+                        </el-select>
+                      </el-form-item>
+
+                    </template>
 
                 <!-- 充值操作特有字段 -->
                 <template v-if="dialog.type === 'recharge'">
@@ -283,131 +352,70 @@
                       placeholder="赠送金额"
                     />
                   </el-form-item>
-
-                  <el-form-item label="支付方式" prop="paymentType">
-                    <el-select
-                      v-model="formData.paymentType"
-                      placeholder="支付方式"
-                      clearable
-                    >
-                      <el-option
-                        v-for="item in member_recharge_record_payment_type_Options"
-                        :key="Number(item.value)"
-                        :label="item.label"
-                        :value="Number(item.value)"
-                      />
-                    </el-select>
-                  </el-form-item>
-
-                  <el-form-item label="充值时间" prop="rechargeTime">
-                    <el-date-picker
-                      v-model="formData.rechargeTime"
-                      type="datetime"
-                      placeholder="充值时间"
-                      value-format="YYYY-MM-DD HH:mm:ss"
-                    />
-                  </el-form-item>
-
-                  <el-form-item label="操作员ID" prop="operatorId">
-                    <el-input
-                      v-model="formData.operatorId"
-                      placeholder="操作员ID"
-                    />
-                  </el-form-item>
-
-                  <!--                <el-form-item label="状态" prop="status">-->
-                  <!--                      <el-input-->
-                  <!--                          v-model="formData.status"-->
-                  <!--                          placeholder="状态"-->
-                  <!--                      />-->
-                  <!--                </el-form-item>-->
-
-                  <el-form-item label="状态" prop="status">
-                    <el-select
-                      v-model="formData.status"
-                      placeholder="状态"
-                      clearable
-                    >
-                      <el-option
-                        v-for="item in member_recharge_record_status_Options"
-                        :key="Number(item.value)"
-                        :label="item.label"
-                        :value="Number(item.value)"
-                      />
-                    </el-select>
-                  </el-form-item>
-
-                  <el-form-item label="备注" prop="remark">
-                    <el-input
-                      v-model="formData.remark"
-                      placeholder="备注"
-                      type="textarea"
-                    />
-                  </el-form-item>
-
                 </template>
 
-        <!-- 新增/编辑操作字段 -->
-        <template v-else>
+                <!-- 新增/编辑操作字段 -->
+                <template v-else>
 
-                <el-form-item label="充值金额" prop="amount">
-                      <el-input
-                          v-model="formData.amount"
-                          placeholder="充值金额"
-                      />
+                        <el-form-item label="充值金额" prop="amount">
+                              <el-input
+                                  v-model="formData.amount"
+                                  placeholder="充值金额"
+                              />
+                        </el-form-item>
+
+                        <el-form-item label="赠送金额" prop="giftAmount">
+                              <el-input
+                                  v-model="formData.giftAmount"
+                                  placeholder="赠送金额"
+                              />
+                        </el-form-item>
+                </template>
+
+        <!--                <el-form-item label="支付方式" prop="paymentType">-->
+        <!--                      <el-input-->
+        <!--                          v-model="formData.paymentType"-->
+        <!--                          placeholder="支付方式"-->
+        <!--                      />-->
+        <!--                </el-form-item>-->
+
+                <el-form-item label="支付方式" prop="paymentType">
+                  <el-select
+                    v-model="formData.paymentType"
+                    placeholder="支付方式"
+                    clearable
+                  >
+                    <el-option
+                      v-for="item in member_recharge_record_payment_type_Options"
+                      :key="Number(item.value)"
+                      :label="item.label"
+                      :value="Number(item.value)"
+                    />
+                  </el-select>
                 </el-form-item>
-
-                <el-form-item label="赠送金额" prop="giftAmount">
-                      <el-input
-                          v-model="formData.giftAmount"
-                          placeholder="赠送金额"
-                      />
-                </el-form-item>
-
-<!--                <el-form-item label="支付方式" prop="paymentType">-->
-<!--                      <el-input-->
-<!--                          v-model="formData.paymentType"-->
-<!--                          placeholder="支付方式"-->
-<!--                      />-->
-<!--                </el-form-item>-->
-
-                    <el-form-item label="支付方式" prop="paymentType">
-                      <el-select
-                        v-model="formData.paymentType"
-                        placeholder="支付方式"
-                        clearable
-                      >
-                        <el-option
-                          v-for="item in member_recharge_record_payment_type_Options"
-                          :key="Number(item.value)"
-                          :label="item.label"
-                          :value="Number(item.value)"
-                        />
-                      </el-select>
-                    </el-form-item>
 
                 <el-form-item label="充值时间" prop="rechargeTime">
-                      <el-date-picker
-                          v-model="formData.rechargeTime"
-                          type="datetime"
-                          placeholder="充值时间"
-                          value-format="YYYY-MM-DD HH:mm:ss"
-                      />
+                  <el-date-picker
+                    v-model="formData.rechargeTime"
+                    type="datetime"
+                    placeholder="充值时间"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                  />
                 </el-form-item>
 
                 <el-form-item label="操作员ID" prop="operatorId">
-                      <el-input
-                          v-model="formData.operatorId"
-                          placeholder="操作员ID"
-                      />
+                  <el-input
+                    v-model="formData.operatorId"
+                    placeholder="操作员ID"
+                  />
                 </el-form-item>
 
-<!--                <el-form-item label="状态" prop="status">-->
-<!--                      <el-input-->
-<!--                          v-model="formData.status"-->
-<!--                          placeholder="状态"-->
-<!--                      />-->
-<!--                </el-form-item>-->
+                <!--                <el-form-item label="状态" prop="status">-->
+                <!--                      <el-input-->
+                <!--                          v-model="formData.status"-->
+                <!--                          placeholder="状态"-->
+                <!--                      />-->
+                <!--                </el-form-item>-->
 
                 <el-form-item label="状态" prop="status">
                   <el-select
@@ -425,13 +433,13 @@
                 </el-form-item>
 
                 <el-form-item label="备注" prop="remark">
-                      <el-input
-                          v-model="formData.remark"
-                          placeholder="备注"
-                          type="textarea"
-                      />
+                  <el-input
+                    v-model="formData.remark"
+                    placeholder="备注"
+                    type="textarea"
+                  />
                 </el-form-item>
-        </template>
+
       </el-form>
       <template #footer>
         <div class="dialog-footer">

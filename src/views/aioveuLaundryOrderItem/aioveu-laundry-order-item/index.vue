@@ -10,43 +10,100 @@
 <!--                          @keyup.enter="handleQuery()"-->
 <!--                      />-->
 <!--                </el-form-item>-->
-                <el-form-item label="订单ID" prop="orderId">
-                      <el-input
-                          v-model="queryParams.orderId"
-                          placeholder="订单ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
-                <el-form-item label="衣物类型ID" prop="clothingTypeId">
-                      <el-input
-                          v-model="queryParams.clothingTypeId"
-                          placeholder="衣物类型ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="订单ID" prop="orderId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.orderId"-->
+<!--                          placeholder="订单ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+                    <el-form-item label="订单号" prop="orderId">
+                      <el-select
+                        v-model="queryParams.orderId"
+                        placeholder="请选择订单号"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in laundryOrderOption"
+                          :key="item.orderId"
+                          :label="item.orderNo"
+                          :value="item.orderId"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+
+<!--                <el-form-item label="衣物类型ID" prop="clothingTypeId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.clothingTypeId"-->
+<!--                          placeholder="衣物类型ID"-->
+<!--                          clearable-->
+<!--                          filterable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="衣物类型" prop="clothingTypeId">
+                      <el-select
+                        v-model="queryParams.clothingTypeId"
+                        placeholder="请选择衣物类型"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in laundryClothingTypeOption"
+                          :key="item.clothingTypeId"
+                          :label="item.clothingTypeName"
+                          :value="item.clothingTypeId"
+                        />
+                      </el-select>
+                    </el-form-item>
+
                 <el-form-item label="自定义衣物类型" prop="customType">
                       <el-input
                           v-model="queryParams.customType"
                           placeholder="自定义衣物类型"
                           clearable
+                          type="textarea"
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="处理状态" prop="processStatus">
-                      <el-input
-                          v-model="queryParams.processStatus"
-                          placeholder="处理状态"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="处理状态" prop="processStatus">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.processStatus"-->
+<!--                          placeholder="处理状态"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+                    <el-form-item label="处理状态" prop="processStatus">
+                      <el-select
+                        v-model="queryParams.processStatus"
+                        placeholder="请选择处理状态"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in processStatusOptions"
+                          :key="Number(item.value)"
+                          :label="item.label"
+                          :value="Number(item.value)"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+
                 <el-form-item label="特殊要求" prop="specialInstruction">
                       <el-input
                           v-model="queryParams.specialInstruction"
                           placeholder="特殊要求"
                           clearable
+                          type="textarea"
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
@@ -100,20 +157,40 @@
 <!--                        min-width="150"-->
 <!--                        align="center"-->
 <!--                    />-->
-                    <el-table-column
-                        key="orderId"
-                        label="订单ID"
-                        prop="orderId"
+<!--                    <el-table-column-->
+<!--                        key="orderId"-->
+<!--                        label="订单ID"-->
+<!--                        prop="orderId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
+                  <!-- 修改：将所属ID改为所属名称 -->
+                      <el-table-column
+                        key="orderNo"
+                        label="订单号"
+                        prop="orderNo"
                         min-width="150"
                         align="center"
-                    />
+                      />
+
+<!--                    <el-table-column-->
+<!--                        key="clothingTypeId"-->
+<!--                        label="衣物类型ID"-->
+<!--                        prop="clothingTypeId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="clothingTypeId"
-                        label="衣物类型ID"
-                        prop="clothingTypeId"
-                        min-width="150"
-                        align="center"
+                      key="clothingTypeName"
+                      label="衣物类型"
+                      prop="clothingTypeName"
+                      min-width="150"
+                      align="center"
                     />
+
+
                     <el-table-column
                         key="customType"
                         label="自定义衣物类型"
@@ -135,13 +212,24 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="processStatus"-->
+<!--                        label="处理状态"-->
+<!--                        prop="processStatus"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="processStatus"
-                        label="处理状态"
-                        prop="processStatus"
-                        min-width="150"
-                        align="center"
-                    />
+                      label="处理状态"
+                      min-width="150"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <DictLabel v-model="scope.row.processStatus" code="laundry_order_item_process_status" />
+                      </template>
+                    </el-table-column>
+
                     <el-table-column
                         key="specialInstruction"
                         label="特殊要求"
@@ -220,24 +308,83 @@
         @close="handleCloseDialog"
     >
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
-                <el-form-item label="订单ID" prop="orderId">
-                      <el-input
-                          v-model="formData.orderId"
-                          placeholder="订单ID"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="订单ID" prop="orderId">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.orderId"-->
+<!--                          placeholder="订单ID"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
-                <el-form-item label="衣物类型ID" prop="clothingTypeId">
-                      <el-input
-                          v-model="formData.clothingTypeId"
-                          placeholder="衣物类型ID"
-                      />
+        <!-- 编辑特有字段 -->
+        <template v-if="dialog.type === 'edit'">
+                <el-form-item label="订单号" prop="orderId">
+                  <el-select
+                    v-model="formData.orderId"
+                    placeholder="请选择订单号"
+                    clearable
+                    filterable
+                    disabled
+                  >
+                    <template #prefix>
+                      <el-icon><lock /></el-icon>
+                    </template>
+                    <el-option
+                      v-for="item in laundryOrderOption"
+                      :key="item .orderId"
+                      :label="item .orderNo"
+                      :value="item .orderId"
+                    />
+                  </el-select>
+                </el-form-item>
+        </template>
+
+        <!-- 新增操作字段 -->
+        <template v-else>
+          <el-form-item label="订单号" prop="orderId">
+            <el-select
+              v-model="formData.orderId"
+              placeholder="请选择订单号"
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="item in laundryOrderOption"
+                :key="item .orderId"
+                :label="item .orderNo"
+                :value="item .orderId"
+              />
+            </el-select>
+          </el-form-item>
+        </template>
+
+<!--                <el-form-item label="衣物类型ID" prop="clothingTypeId">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.clothingTypeId"-->
+<!--                          placeholder="衣物类型ID"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                <el-form-item label="衣物类型" prop="clothingTypeId">
+                  <el-select
+                    v-model="formData.clothingTypeId"
+                    placeholder="衣物类型"
+                    clearable
+                    filterable
+                  >
+                    <el-option
+                      v-for="item in laundryClothingTypeOption"
+                      :key="item.clothingTypeId"
+                      :label="item.clothingTypeName"
+                      :value="item.clothingTypeId"
+                    />
+                  </el-select>
                 </el-form-item>
 
                 <el-form-item label="自定义类型" prop="customType">
                       <el-input
                           v-model="formData.customType"
                           placeholder="自定义衣物类型"
+                          type="textarea"
                       />
                 </el-form-item>
 
@@ -245,6 +392,7 @@
                       <el-input
                           v-model="formData.problemDesc"
                           placeholder="问题描述"
+                          type="textarea"
                       />
                 </el-form-item>
 
@@ -255,17 +403,34 @@
                       />
                 </el-form-item>
 
+<!--                <el-form-item label="处理状态" prop="processStatus">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.processStatus"-->
+<!--                          placeholder="处理状态"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
                 <el-form-item label="处理状态" prop="processStatus">
-                      <el-input
-                          v-model="formData.processStatus"
-                          placeholder="处理状态"
-                      />
+                  <el-select
+                    v-model="formData.processStatus"
+                    placeholder="处理状态"
+                    clearable
+                    filterable
+                  >
+                    <el-option
+                      v-for="item in processStatusOptions"
+                      :key="Number(item.value)"
+                      :label="item.label"
+                      :value="Number(item.value)"
+                    />
+                  </el-select>
                 </el-form-item>
 
                 <el-form-item label="特殊要求" prop="specialInstruction">
                       <el-input
                           v-model="formData.specialInstruction"
                           placeholder="特殊要求"
+                          type="textarea"
                       />
                 </el-form-item>
 
@@ -305,6 +470,21 @@
   });
 
   import AioveuLaundryOrderItemAPI, { AioveuLaundryOrderItemPageVO, AioveuLaundryOrderItemForm, AioveuLaundryOrderItemPageQuery } from "@/api/aioveuLaundryOrderItem/aioveu-laundry-order-item";
+  import AioveuLaundryOrderAPI, {AioveuLaundryOrderOptionVO} from "@/api/aioveuLaundryOrder/aioveu-laundry-order";
+  import AioveuLaundryClothingTypeAPI, {AioveuLaundryClothingTypeOptionVO} from "@/api/aioveuLaundryClothingType/aioveu-laundry-clothing-type";
+
+  // 导入字典值
+  import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
+
+  // 状态选项
+  const processStatusOptions = ref<DictItemOption[]>([])
+
+  // 状态字典
+  function loadDict() {
+    DictAPI.getDictItems('laundry_order_item_process_status').then(response => {
+      processStatusOptions.value = response
+    })
+  }
 
   const queryFormRef = ref();
   const dataFormRef = ref();
@@ -313,10 +493,30 @@
   const removeIds = ref<number[]>([]);
   const total = ref(0);
 
+  // 新增：选项
+  const laundryClothingTypeOption = ref<AioveuLaundryClothingTypeOptionVO[]>([]);
+
+  // 加载选项
+  function loadOptions() {
+    AioveuLaundryClothingTypeAPI.getAllLaundryClothingTypeOptions().then(response => {
+      laundryClothingTypeOption.value = response
+    })
+  }
+
   const queryParams = reactive<AioveuLaundryOrderItemPageQuery>({
     pageNum: 1,
     pageSize: 10,
   });
+
+  // 新增：选项
+  const laundryOrderOption = ref<AioveuLaundryOrderOptionVO[]>([]);
+
+  // 加载选项
+  function loadLaundryOrderOptions() {
+    AioveuLaundryOrderAPI.getAllLaundryOrderOptions().then(response => {
+      laundryOrderOption.value = response
+    })
+  }
 
   // 洗衣订单衣物明细表格数据
   const pageData = ref<AioveuLaundryOrderItemPageVO[]>([]);
@@ -324,6 +524,7 @@
   // 弹窗
   const dialog = reactive({
     title: "",
+    type: " ",// 'recharge', 'add', 'edit'
     visible: false,
   });
 
@@ -365,14 +566,22 @@
 
   /** 打开洗衣订单衣物明细弹窗 */
   function handleOpenDialog(id?: number) {
-    dialog.visible = true;
+    // dialog.visible = true;
     if (id) {
       dialog.title = "修改洗衣订单衣物明细";
+      dialog.type = 'edit'; // 标记为编辑操作
             AioveuLaundryOrderItemAPI.getFormData(id).then((data) => {
         Object.assign(formData, data);
+              //先准备数据，再显示弹窗
+              dialog.visible = true;
       });
     } else {
       dialog.title = "新增洗衣订单衣物明细";
+      dialog.type = 'add'; // 标记为新增操作
+      // 直接打开弹窗
+      dialog.visible = true;
+      // 重置清空表单
+      dataFormRef.value.resetFields();
     }
   }
 
@@ -406,9 +615,16 @@
   /** 关闭洗衣订单衣物明细弹窗 */
   function handleCloseDialog() {
     dialog.visible = false;
-    dataFormRef.value.resetFields();
-    dataFormRef.value.clearValidate();
-    formData.id = undefined;
+    // 关键修复：在关闭弹窗时重置加载状态
+    loading.value = false;
+
+    // 延迟重置表单（等待动画完成）
+    setTimeout(() => {
+      dataFormRef.value.resetFields();
+      dataFormRef.value.clearValidate();
+      //editingId.value = undefined;
+      formData.id = undefined;
+    }, 3);
   }
 
   /** 删除洗衣订单衣物明细 */
@@ -441,5 +657,8 @@
 
   onMounted(() => {
     handleQuery();
+    loadLaundryOrderOptions()
+    loadOptions()
+    loadDict()
   });
 </script>

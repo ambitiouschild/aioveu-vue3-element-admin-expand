@@ -33,7 +33,7 @@ const AioveuLaundryOrderAPI = {
         return request({
             url: `${AIOVEULAUNDRYORDER_BASE_URL}`,
             method: "post",
-            data: data,
+            data,
         });
     },
 
@@ -47,7 +47,7 @@ const AioveuLaundryOrderAPI = {
         return request({
             url: `${AIOVEULAUNDRYORDER_BASE_URL}/${id}`,
             method: "put",
-            data: data,
+            data,
         });
     },
 
@@ -61,7 +61,29 @@ const AioveuLaundryOrderAPI = {
             url: `${AIOVEULAUNDRYORDER_BASE_URL}/${ids}`,
             method: "delete",
         });
+    },
+
+    /**
+     * 获取所有选项列表（用于下拉选择框）
+     * @returns 选项列表
+     * 因为request函数的类型定义允许第一个类型参数为any，从而绕过了类型检查
+     */
+    getAllLaundryOrderOptions() {
+      return request<any,AioveuLaundryOrderOptionVO[]>({
+        url: `${AIOVEULAUNDRYORDER_BASE_URL}/options`,
+        method: "get",
+      });
     }
+
+
+}
+
+/** 选项VO（用于下拉选择框） */
+export interface AioveuLaundryOrderOptionVO {
+  /** ID */
+  orderId: number;
+  /** 名称 */
+  orderNo: string;
 }
 
 export default AioveuLaundryOrderAPI;
@@ -84,6 +106,8 @@ export interface AioveuLaundryOrderPageQuery extends PageQuery {
 
 /** 洗衣订单表单对象 */
 export interface AioveuLaundryOrderForm {
+  /** 订单ID */
+  id?:  number;
     /** 订单号 */
     orderNo?:  string;
     /** 会员ID */
