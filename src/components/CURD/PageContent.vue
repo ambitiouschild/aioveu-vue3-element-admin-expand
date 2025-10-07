@@ -919,8 +919,37 @@ function saveXlsx(fileData: any, fileName: string) {
   window.URL.revokeObjectURL(downloadUrl);
 }
 
-// 暴露的属性和方法
-defineExpose({ fetchPageData, exportPageData, getFilterParams, getSelectionData, handleRefresh });
+// 暴露的属性和方法 这样，父组件就可以通过ref调用这些方法了。
+//我们注意到，在导入导出功能中，有些方法需要参数（如handleOpenImportModal需要isFile参数），而我们在暴露的时候并没有改变它们。因此，父组件在调用这些方法时，需要传递相应的参数。
+//另外，我们也可以考虑将导入导出功能单独封装成一个组件，但这样需要将表格的配置（如列信息、权限前缀等）传递进去，可能会增加复杂度。
+//因此，我建议采用在现有表格组件中暴露方法的方式，这样父组件可以通过ref调用导入导出的各个功能。
+
+//我们也要注意，有些方法在内部使用，可能不适合直接暴露给父组件。例如，handleImport和handleImports这两个方法，
+// 它们分别处理两种不同的导入方式（直接导入和批量导入）。在内部，我们通过isFileImport来区分，而父组件直接调用handleImport可能无法设置这个标志。
+
+//需要调整一下，只暴露那些父组件可能需要的方法，并且确保这些方法在调用时不需要内部状态。
+// 我们暴露的方法应该是那些打开弹窗、关闭弹窗等操作，而具体的提交操作（如handleImportSubmit）已经在弹窗内部绑定，父组件通常不需要直接调用。
+defineExpose({
+  fetchPageData,
+  exportPageData,
+  getFilterParams,
+  getSelectionData,
+  handleRefresh ,
+  handleOpenImportModal,  // 打开导入弹窗（可以传入参数）
+  handleDownloadTemplate, // 下载模板（不需要参数）
+  handleImportSubmit,     // 提交导入
+  handleCloseImportModal, // 关闭导入弹窗
+  handleImport,           // 执行导入
+  handleOpenExportsModal, // 打开导出弹窗
+  handleExportsSubmit,    // 提交导出
+  handleCloseExportsModal // 关闭导出弹窗
+});
+
+//父组件可以打开导入导出弹窗，但具体的提交操作由弹窗内的按钮触发，这样逻辑就清晰了。
+//我们注意到，在导入弹窗中，有一个“确定”按钮，它触发了handleImportSubmit，
+// 而handleImportSubmit内部会根据isFileImport调用handleImport或handleImports。
+// 这个状态isFileImport是在打开弹窗时设置的（通过handleOpenImportModal的参数）。
+// 因此，我们暴露handleOpenImportModal给父组件，并允许传递参数，这样父组件可以决定打开哪种导入（直接导入或批量导入）。
 </script>
 
 <style lang="scss" scoped>

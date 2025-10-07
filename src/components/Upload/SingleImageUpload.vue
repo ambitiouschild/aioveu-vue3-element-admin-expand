@@ -12,7 +12,20 @@
     :on-error="onError"
   >
     <template #default>
-      <el-image v-if="modelValue" :src="modelValue" />
+<!--      添加加载状态，让用户知道上传进度-->
+      <div v-if="loading" class="upload-loading">
+        <el-icon class="is-loading"><Loading /></el-icon>
+        <span>上传中...</span>
+      </div>
+
+<!--      添加大图预览功能-->
+      <el-image v-if="modelValue"
+                :src="modelValue"
+                :preview-src-list="[modelValue]"
+                :preview-teleported="true"
+                hide-on-click-modal
+      />
+
       <el-icon v-if="modelValue" class="single-upload__delete-btn" @click.stop="handleDelete">
         <CircleCloseFilled />
       </el-icon>
@@ -20,12 +33,21 @@
         <Plus />
       </el-icon>
     </template>
+
+    <!-- 添加自定义插槽  允许用户自定义上传按钮样式 -->
+    <template v-if="$slots.uploadButton" #trigger>
+      <slot name="uploadButton"></slot>
+    </template>
+
   </el-upload>
 </template>
 
 <script setup lang="ts">
 import { UploadRawFile, UploadRequestOptions } from "element-plus";
 import FileAPI, { FileInfo } from "@/api/file.api";
+
+// 添加加载状态
+const loading = ref(false);
 
 const props = defineProps({
   /**
@@ -156,11 +178,38 @@ const onSuccess = (fileInfo: FileInfo) => {
 };
 
 /**
- * 上传失败回调
+ * 上传失败回调  提供更详细的错误信息和重试机制
  */
 const onError = (error: any) => {
-  console.log("onError");
-  ElMessage.error("上传失败: " + error.message);
+  console.log("上传失败:", error);
+  loading.value = false;
+
+  let errorMessage = "上传失败";
+
+  if (error.response) {
+    // 服务器返回的错误
+    const status = error.response.status;
+    switch(status) {
+      case 413:
+        errorMessage = "文件过大，请压缩后上传";
+        break;
+      case 415:
+        errorMessage = "不支持的图片格式";
+        break;
+      case 500:
+        errorMessage = "服务器错误，请稍后重试";
+        break;
+      default:
+        errorMessage = `上传失败: ${error.response.data?.message || "未知错误"}`;
+    }
+  } else if (error.request) {
+    // 请求已发出但无响应
+    errorMessage = "网络连接失败，请检查网络";
+  } else {
+    // 其他错误
+    errorMessage = error.message || "上传过程中发生错误";
+  }
+  ElMessage.error(errorMessage);
 };
 </script>
 

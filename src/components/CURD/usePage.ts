@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import type { IObject, PageContentInstance, PageModalInstance, PageSearchInstance } from "./types";
+import { ElLoading } from "element-plus";
 
 function usePage() {
   const searchRef = ref<PageSearchInstance>();
@@ -75,6 +76,7 @@ function usePage() {
     const queryParams = searchRef.value?.getQueryParams();
     contentRef.value?.exportPageData(queryParams);
   }
+
   // 搜索显隐
   function handleSearchClick() {
     searchRef.value?.toggleVisible();

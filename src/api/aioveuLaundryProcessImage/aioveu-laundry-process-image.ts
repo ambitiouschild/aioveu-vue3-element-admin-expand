@@ -61,7 +61,54 @@ const AioveuLaundryProcessImageAPI = {
             url: `${AIOVEULAUNDRYPROCESSIMAGE_BASE_URL}/${ids}`,
             method: "delete",
         });
-    }
+    },
+
+    /**
+     * 导出洗衣流程图片记录数据
+     * @param params 查询参数（与分页查询参数一致）
+     * @returns 导出文件的Blob数据
+     */
+    exportData(queryParams?: AioveuLaundryProcessImagePageQuery) {
+      return request({
+        url: `${AIOVEULAUNDRYPROCESSIMAGE_BASE_URL}/export`,
+        method: "post",
+        data:queryParams,
+        responseType: 'blob' // 重要：指定响应类型为blob
+      });
+    },
+
+    /**
+     * 导入洗衣流程图片记录数据
+     * @param file 要导入的文件
+     * @returns 导入结果
+     */
+    importData(file: File) {
+
+      // 创建FormData对象 添加了 FormData对象处理文件上传
+      const formData = new FormData();
+      formData.append('file', file);
+
+      return request({
+        url: `${AIOVEULAUNDRYPROCESSIMAGE_BASE_URL}/import`,
+        method: "post",
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    },
+
+    /**
+     * 下载导入模板
+     * @returns 模板文件的Blob数据
+     */
+    downloadTemplate() {
+      return request({
+        url: `${AIOVEULAUNDRYPROCESSIMAGE_BASE_URL}/template`,
+        method: "get",
+        responseType: 'blob'
+      });
+    },
 }
 
 export default AioveuLaundryProcessImageAPI;
