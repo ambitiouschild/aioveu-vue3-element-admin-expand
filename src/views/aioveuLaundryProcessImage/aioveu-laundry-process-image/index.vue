@@ -244,13 +244,13 @@
                       </template>
                     </el-table-column>
 
-                    <el-table-column
-                        key="imageUrl"
-                        label="图片路径"
-                        prop="imageUrl"
-                        min-width="250"
-                        align="center"
-                    />
+<!--                    <el-table-column-->
+<!--                        key="imageUrl"-->
+<!--                        label="图片路径"-->
+<!--                        prop="imageUrl"-->
+<!--                        min-width="250"-->
+<!--                        align="center"-->
+<!--                    />-->
 
                     <el-table-column
                       key="imageUrl"
@@ -266,6 +266,8 @@
                           fit="cover"
                           lazy
                           :scroll-container="'.el-table__body-wrapper'"
+                          :preview-teleported="true"
+                          hide-on-click-modal
                         >
                           <template #placeholder>
                             <div class="image-loading">

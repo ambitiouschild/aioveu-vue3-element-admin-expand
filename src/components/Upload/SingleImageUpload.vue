@@ -19,13 +19,16 @@
       </div>
 
 <!--      添加大图预览功能-->
-      <el-image v-if="modelValue"
-                :src="modelValue"
-                :preview-src-list="[modelValue]"
-                :preview-teleported="true"
-                hide-on-click-modal
+<!--      在使用 el-image组件的大图预览功能时，预览背景是空的（透明或白色），导致与底层内容重叠。这通常是由于预览模态框的背景样式问题导致的。-->
+      <!-- 优化大图预览功能 -->
+      <el-image
+        v-if="modelValue"
+        :src="modelValue"
+        :preview-src-list="[modelValue]"
+        :preview-teleported="true"
+        hide-on-click-modal
+        class="preview-image"
       />
-
       <el-icon v-if="modelValue" class="single-upload__delete-btn" @click.stop="handleDelete">
         <CircleCloseFilled />
       </el-icon>
@@ -48,6 +51,16 @@ import FileAPI, { FileInfo } from "@/api/file.api";
 
 // 添加加载状态
 const loading = ref(false);
+
+
+//图片上传与URL转换机制
+//  上传流程
+// 1.用户选择图片：用户通过上传组件选择本地图片文件
+// 2.前端验证：handleBeforeUpload函数验证文件类型和大小
+// 3.发送请求：通过handleUpload函数将文件发送到后端
+// 4.后端处理：后端接收文件，保存到存储系统（如本地磁盘、云存储等）
+// 5.返回URL：后端生成文件的访问URL并返回给前端
+// 6.前端更新：前端将返回的URL赋值给modelValue
 
 const props = defineProps({
   /**
@@ -143,7 +156,7 @@ function handleUpload(options: UploadRequestOptions) {
     const file = options.file;
 
     const formData = new FormData();
-    formData.append(props.name, file);
+    formData.append(props.name, file); // 添加文件
 
     // 处理附加参数
     Object.keys(props.data).forEach((key) => {
@@ -152,7 +165,7 @@ function handleUpload(options: UploadRequestOptions) {
 
     FileAPI.upload(formData)
       .then((data) => {
-        resolve(data);
+        resolve(data);  // 返回上传结果
       })
       .catch((error) => {
         reject(error);
@@ -174,7 +187,7 @@ function handleDelete() {
  */
 const onSuccess = (fileInfo: FileInfo) => {
   ElMessage.success("上传成功");
-  modelValue.value = fileInfo.url;
+  modelValue.value = fileInfo.url;   // 将返回的URL赋值给模型值
 };
 
 /**
@@ -211,6 +224,7 @@ const onError = (error: any) => {
   }
   ElMessage.error(errorMessage);
 };
+
 </script>
 
 <style scoped lang="scss">
@@ -246,5 +260,6 @@ const onError = (error: any) => {
       color: #ff4500;
     }
   }
+
 }
 </style>
