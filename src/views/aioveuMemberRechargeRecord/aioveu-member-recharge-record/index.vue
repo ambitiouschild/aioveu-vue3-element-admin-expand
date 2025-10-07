@@ -201,12 +201,20 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="operatorId"-->
+<!--                        label="操作员"-->
+<!--                        prop="operatorId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="operatorId"
-                        label="操作员"
-                        prop="operatorId"
-                        min-width="150"
-                        align="center"
+                      key="operatorName"
+                      label="操作员"
+                      prop="operatorName"
+                      min-width="150"
+                      align="center"
                     />
 <!--                    <el-table-column-->
 <!--                        key="status"-->
@@ -403,12 +411,29 @@
                   />
                 </el-form-item>
 
-                <el-form-item label="操作员ID" prop="operatorId">
-                  <el-input
-                    v-model="formData.operatorId"
-                    placeholder="操作员ID"
-                  />
-                </el-form-item>
+<!--                <el-form-item label="操作员ID" prop="operatorId">-->
+<!--                  <el-input-->
+<!--                    v-model="formData.operatorId"-->
+<!--                    placeholder="操作员ID"-->
+<!--                  />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="操作员" prop="operatorId">
+                      <el-select
+                        v-model="formData.operatorId"
+                        placeholder="操作员"
+                        clearable
+                        filterable
+                      >
+                        <el-option
+                          v-for="item in employeeOption"
+                          :key="item.employeeId"
+                          :label="item.employeeName"
+                          :value="item.employeeId"
+                        />
+                      </el-select>
+                    </el-form-item>
+
 
                 <!--                <el-form-item label="状态" prop="status">-->
                 <!--                      <el-input-->
@@ -461,14 +486,14 @@
   import AioveuMemberAPI, { AioveuMemberOptionVO } from "@/api/aioveuMember/aioveu-member";
   // 导入字典值
   import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
-
+  import AioveuEmployeeAPI, {EmployeeOptionVO} from "@/api/aioveuEmployee/aioveu-employee";
   // 新增：选项
   const aioveuMemberOption = ref<AioveuMemberOptionVO[]>([]);
   // 状态选项
   const member_recharge_record_payment_type_Options = ref<DictItemOption[]>([])
 
   const member_recharge_record_status_Options = ref<DictItemOption[]>([])
-
+  const employeeOption = ref<EmployeeOptionVO[]>([]);
   // 状态字典
   function load_member_recharge_record_payment_type_Options() {
     DictAPI.getDictItems('member_recharge_record_payment_type').then(response => {
@@ -479,6 +504,9 @@
   function load_member_recharge_record_status_Options() {
     DictAPI.getDictItems('member_recharge_record_status').then(response => {
       member_recharge_record_status_Options.value = response
+    })
+    AioveuEmployeeAPI.getAllEmployeeOptions().then(response => {
+      employeeOption.value = response
     })
   }
 

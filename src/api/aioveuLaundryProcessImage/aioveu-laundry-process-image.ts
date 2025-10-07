@@ -33,7 +33,7 @@ const AioveuLaundryProcessImageAPI = {
         return request({
             url: `${AIOVEULAUNDRYPROCESSIMAGE_BASE_URL}`,
             method: "post",
-            data: data,
+            data,
         });
     },
 
@@ -47,7 +47,7 @@ const AioveuLaundryProcessImageAPI = {
         return request({
             url: `${AIOVEULAUNDRYPROCESSIMAGE_BASE_URL}/${id}`,
             method: "put",
-            data: data,
+            data,
         });
     },
 
@@ -82,6 +82,8 @@ export interface AioveuLaundryProcessImagePageQuery extends PageQuery {
 
 /** 洗衣流程图片记录表单对象 */
 export interface AioveuLaundryProcessImageForm {
+  /** 图片记录ID */
+  id?:  number;
     /** 订单ID */
     orderId?:  number;
     /** 衣物明细ID */

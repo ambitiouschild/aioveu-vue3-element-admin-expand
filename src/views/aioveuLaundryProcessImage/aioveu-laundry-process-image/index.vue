@@ -10,38 +10,110 @@
 <!--                          @keyup.enter="handleQuery()"-->
 <!--                      />-->
 <!--                </el-form-item>-->
-                <el-form-item label="订单ID" prop="orderId">
-                      <el-input
-                          v-model="queryParams.orderId"
-                          placeholder="订单ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+<!--                <el-form-item label="订单ID" prop="orderId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.orderId"-->
+<!--                          placeholder="订单ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="订单号" prop="orderId">
+                      <el-select
+                        v-model="queryParams.orderId"
+                        placeholder="请选择订单号"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in orderOption"
+                          :key="item.orderId"
+                          :label="item.orderNo"
+                          :value="item.orderId"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+<!--                <el-form-item label="衣物明细ID" prop="itemId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.itemId"-->
+<!--                          placeholder="衣物明细ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="衣物明细" prop="itemId">
+                      <el-select
+                        v-model="queryParams.itemId"
+                        placeholder="请选择衣物明细"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in itemOption"
+                          :key="item.itemId"
+                          :label="item.problemDesc"
+                          :value="item.itemId"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+<!--                <el-form-item label="图片类型" prop="imageType">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.imageType"-->
+<!--                          placeholder="图片类型"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="图片类型" prop="imageType">
+                      <el-select
+                        v-model="queryParams.imageType"
+                        placeholder="图片类型"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in imageTypeOptions"
+                          :key="Number(item.value)"
+                          :label="item.label"
+                          :value="Number(item.value)"
+                        />
+                      </el-select>
+                    </el-form-item>
+
+<!--                <el-form-item label="上传人ID" prop="uploadUser">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.uploadUser"-->
+<!--                          placeholder="上传人ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                <el-form-item label="上传人" prop="uploadUser">
+                  <el-select
+                    v-model="queryParams.uploadUser"
+                    placeholder="上传人"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in employeeOption"
+                      :key="item.employeeId"
+                      :label="item.employeeName"
+                      :value="item.employeeId"
+                    />
+                  </el-select>
                 </el-form-item>
-                <el-form-item label="衣物明细ID" prop="itemId">
-                      <el-input
-                          v-model="queryParams.itemId"
-                          placeholder="衣物明细ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
-                <el-form-item label="图片类型" prop="imageType">
-                      <el-input
-                          v-model="queryParams.imageType"
-                          placeholder="图片类型"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
-                <el-form-item label="上传人ID" prop="uploadUser">
-                      <el-input
-                          v-model="queryParams.uploadUser"
-                          placeholder="上传人ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="handleQuery">
             <template #icon><Search /></template>
@@ -92,41 +164,79 @@
 <!--                        min-width="150"-->
 <!--                        align="center"-->
 <!--                    />-->
+<!--                    <el-table-column-->
+<!--                        key="orderId"-->
+<!--                        label="订单ID"-->
+<!--                        prop="orderId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="orderId"
-                        label="订单ID"
-                        prop="orderId"
-                        min-width="150"
-                        align="center"
+                      key="orderNo"
+                      label="订单号"
+                      prop="orderNo"
+                      min-width="150"
+                      align="center"
                     />
+
+<!--                    <el-table-column-->
+<!--                        key="itemId"-->
+<!--                        label="衣物明细ID"-->
+<!--                        prop="itemId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="itemId"
-                        label="衣物明细ID"
-                        prop="itemId"
-                        min-width="150"
-                        align="center"
+                      key="problemDesc"
+                      label="衣物明细"
+                      prop="problemDesc"
+                      min-width="150"
+                      align="center"
                     />
+
+<!--                    <el-table-column-->
+<!--                        key="imageType"-->
+<!--                        label="图片类型"-->
+<!--                        prop="imageType"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="imageType"
-                        label="图片类型"
-                        prop="imageType"
-                        min-width="150"
-                        align="center"
-                    />
+                      label="图片类型"
+                      min-width="150"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <DictLabel v-model="scope.row.imageType" code="laundry_process_image_image_type" />
+                      </template>
+                    </el-table-column>
+
                     <el-table-column
                         key="imageUrl"
                         label="图片路径"
                         prop="imageUrl"
-                        min-width="150"
+                        min-width="250"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="uploadUser"-->
+<!--                        label="上传人ID"-->
+<!--                        prop="uploadUser"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="uploadUser"
-                        label="上传人ID"
-                        prop="uploadUser"
-                        min-width="150"
-                        align="center"
+                      key="uploadUserName"
+                      label="上传人"
+                      prop="uploadUserName"
+                      min-width="150"
+                      align="center"
                     />
+
                     <el-table-column
                         key="description"
                         label="图片描述"
@@ -251,13 +361,38 @@
   });
 
   import AioveuLaundryProcessImageAPI, { AioveuLaundryProcessImagePageVO, AioveuLaundryProcessImageForm, AioveuLaundryProcessImagePageQuery } from "@/api/aioveuLaundryProcessImage/aioveu-laundry-process-image";
-
+  import AioveuLaundryOrderAPI, {AioveuLaundryOrderOptionVO} from "@/api/aioveuLaundryOrder/aioveu-laundry-order";
+  import AioveuLaundryOrderItemAPI, {AioveuLaundryOrderItemOption} from "@/api/aioveuLaundryOrderItem/aioveu-laundry-order-item";
+  import AioveuEmployeeAPI, {EmployeeOptionVO} from "@/api/aioveuEmployee/aioveu-employee";
+  import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
   const queryFormRef = ref();
   const dataFormRef = ref();
 
   const loading = ref(false);
   const removeIds = ref<number[]>([]);
   const total = ref(0);
+
+  const imageTypeOptions = ref<DictItemOption[]>([])
+  // 新增：选项
+  const orderOption = ref<AioveuLaundryOrderOptionVO[]>([]);  // 新增：选项
+  const itemOption = ref<AioveuLaundryOrderItemOption[]>([]);
+  const employeeOption = ref<EmployeeOptionVO[]>([]);
+
+  // 加载选项
+  function loadOptions() {
+    AioveuLaundryOrderAPI.getAllLaundryOrderOptions().then(response => {
+      orderOption.value = response
+    })
+    AioveuLaundryOrderItemAPI.getAllLaundryOrderItemOptions().then(response => {
+      itemOption.value = response
+    })
+    AioveuEmployeeAPI.getAllEmployeeOptions().then(response => {
+      employeeOption.value = response
+    })
+    DictAPI.getDictItems('laundry_process_image_image_type').then(response => {
+      imageTypeOptions.value = response
+    })
+  }
 
   const queryParams = reactive<AioveuLaundryProcessImagePageQuery>({
     pageNum: 1,
@@ -385,5 +520,6 @@
 
   onMounted(() => {
     handleQuery();
+    loadOptions()
   });
 </script>

@@ -34,14 +34,32 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="会员等级" prop="levelId">
-                      <el-input
-                          v-model="queryParams.levelId"
-                          placeholder="会员等级"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="会员等级" prop="levelId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.levelId"-->
+<!--                          placeholder="会员等级"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="会员等级" prop="levelId">
+                      <el-select
+                        v-model="queryParams.levelId"
+                        placeholder="请选择会员等级"
+                        clearable
+                        filterable
+                        @keyup.enter="handleQuery()"
+                      >
+                        <el-option
+                          v-for="item in memberLevelOptions"
+                          :key="item.id"
+                          :label="item.levelName"
+                          :value="item.id"
+                        />
+                      </el-select>
+                    </el-form-item>
+
 <!--                <el-form-item label="状态" prop="status">-->
 <!--                      <el-input-->
 <!--                          v-model="queryParams.status"-->
@@ -267,12 +285,13 @@
 <!--                  </el-input>-->
 <!--                </el-form-item>-->
 
-                <el-form-item label="会员卡号" prop="memberNo">
-                      <el-input
-                          v-model="formData.memberNo"
-                          placeholder="会员卡号"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="会员卡号" prop="memberNo">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.memberNo"-->
+<!--                          placeholder="会员卡号"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
 
                 <el-form-item label="会员姓名" prop="name">
                       <el-input
@@ -295,12 +314,28 @@
                       />
                 </el-form-item>
 
-                <el-form-item label="会员等级" prop="levelId">
-                      <el-input
-                          v-model="formData.levelId"
-                          placeholder="会员等级"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="会员等级" prop="levelId">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.levelId"-->
+<!--                          placeholder="会员等级"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                    <el-form-item label="会员等级" prop="levelId">
+                      <el-select
+                        v-model="formData.levelId"
+                        placeholder="请选择会员等级"
+                        clearable
+                        filterable
+                      >
+                        <el-option
+                          v-for="item in memberLevelOptions"
+                          :key="item .id"
+                          :label="item .levelName"
+                          :value="item .id"
+                        />
+                      </el-select>
+                    </el-form-item>
 
 
 <!--                <el-form-item label="会员等级" prop="levelName">-->
@@ -375,18 +410,24 @@
   });
 
   import AioveuMemberAPI, { AioveuMemberPageVO, AioveuMemberForm, AioveuMemberPageQuery } from "@/api/aioveuMember/aioveu-member";
-
+  import AioveuMemberLevelAPI, {AioveuMemberLevelOptionsVO} from "@/api/aioveuMemberLevel/aioveu-member-level";
   // 导入字典值
   import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
 
   // 状态选项
   const member_status_Options = ref<DictItemOption[]>([])
+  const memberLevelOptions = ref<AioveuMemberLevelOptionsVO[]>([]);
 
   // 状态字典
   function load_member_status_Options() {
     DictAPI.getDictItems('member_status').then(response => {
       member_status_Options.value = response
     })
+
+    AioveuMemberLevelAPI.getAllMemberLevelsOptions().then(response => {
+      memberLevelOptions.value = response
+    })
+
   }
 
   const queryFormRef = ref();
@@ -407,6 +448,7 @@
   // 弹窗
   const dialog = reactive({
     title: "",
+    type: " ",// 'recharge', 'add', 'edit'
     visible: false,
   });
 
@@ -453,6 +495,7 @@
     // editingId.value = id; // 保存ID
     if (id) {
       dialog.title = "修改会员信息管理";
+      dialog.type = 'edit'; // 标记为编辑操作
             AioveuMemberAPI.getFormData(id).then((data) => {
         Object.assign(formData, data);
               //先准备数据，再显示弹窗
@@ -460,8 +503,11 @@
       });
     } else {
       dialog.title = "新增会员信息管理";
+      dialog.type = 'add'; // 标记为新增操作
       // 新增操作直接打开弹窗
       dialog.visible = true;
+      // 新增操作重置清空表单
+      dataFormRef.value.resetFields();
     }
   }
 
@@ -503,7 +549,7 @@
       dataFormRef.value.resetFields();
       dataFormRef.value.clearValidate();
       // editingId.value = undefined;
-    }, 300);
+    }, 3);
   }
 
   /** 删除会员信息管理 */
