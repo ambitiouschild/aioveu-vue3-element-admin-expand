@@ -378,12 +378,13 @@
                         placeholder="请选择订单号"
                         clearable
                         filterable
+                        @change="handleOrderChange"
                       >
                         <el-option
                           v-for="item in orderOption"
-                          :key="item .orderId"
-                          :label="item .orderNo"
-                          :value="item .orderId"
+                          :key="item.orderId"
+                          :label="item.orderNo"
+                          :value="item.orderId"
                         />
                       </el-select>
                     </el-form-item>
@@ -396,21 +397,33 @@
 <!--                      />-->
 <!--                </el-form-item>-->
 
-                    <el-form-item label="衣物明细" prop="itemId">
-                      <el-select
-                        v-model="formData.itemId"
-                        placeholder="请选择衣物明细"
-                        clearable
-                        filterable
-                      >
-                        <el-option
-                          v-for="item in itemOption"
-                          :key="item .itemId"
-                          :label="item .problemDesc"
-                          :value="item .itemId"
-                        />
-                      </el-select>
-                    </el-form-item>
+
+
+                      <el-form-item label="衣物明细" prop="itemId">
+                        <el-select
+                          v-model="formData.itemId"
+                          placeholder="请选择衣物明细"
+                          clearable
+                          filterable
+                          :disabled="!formData.orderId"
+                        >
+
+                          <el-option
+                            v-if="filteredItemOptions.length === 0"
+                            disabled
+                            label="该订单下无衣物明细"
+                            value=""
+                          />
+
+                          <el-option
+                            v-for="item in filteredItemOptions"
+                            :key="item.itemId"
+                            :label="item.problemDesc"
+                            :value="item.itemId"
+                          />
+                        </el-select>
+                      </el-form-item>
+
 
 <!--                <el-form-item label="图片类型" prop="imageType">-->
 <!--                      <el-input-->
@@ -475,9 +488,9 @@
                       >
                         <el-option
                           v-for="item in employeeOption"
-                          :key="item .employeeId"
-                          :label="item .employeeName"
-                          :value="item .employeeId"
+                          :key="item.employeeId"
+                          :label="item.employeeName"
+                          :value="item.employeeId"
                         />
                       </el-select>
                     </el-form-item>
@@ -558,7 +571,15 @@
   const imageTypeOptions = ref<DictItemOption[]>([])
   // 新增：选项
   const orderOption = ref<AioveuLaundryOrderOptionVO[]>([]);  // 新增：选项
+
+  // 所有的衣物明细选项
   const itemOption = ref<AioveuLaundryOrderItemOption[]>([]);
+
+  // 过滤后的衣物明细选项
+  const filteredItemOptions = ref<AioveuLaundryOrderItemOption[]>([]);
+
+
+
   const employeeOption = ref<EmployeeOptionVO[]>([]);
 
   // 加载选项
@@ -577,6 +598,35 @@
     })
   }
 
+  // 添加处理订单变化的方法
+  function handleOrderChange(orderId: number | undefined) {
+    // // 重置衣物明细选择
+    // formData.itemId = undefined;
+
+    if (!orderId) {
+      // 如果没有选择订单，显示所有明细
+      filteredItemOptions.value = [...itemOption.value];
+    } else {
+      // 获取选中的订单号
+      const selectedOrder = orderOption.value.find(order => order.orderId === orderId);
+
+
+      if (selectedOrder) {
+        const orderNo = selectedOrder.orderNo;
+
+        // 过滤出描述中包含订单号的明细
+        filteredItemOptions.value = itemOption.value.filter(
+          item => item.problemDesc.includes(orderNo)
+        );
+        console.log(`筛选订单号: ${orderNo}, 匹配到 ${filteredItemOptions.value.length} 个明细`);
+      } else {
+        // 如果没有找到对应的订单，则清空明细选项
+        filteredItemOptions.value = [];
+      }
+
+    }
+  }
+
   const queryParams = reactive<AioveuLaundryProcessImagePageQuery>({
     pageNum: 1,
     pageSize: 10,
@@ -588,6 +638,7 @@
   // 弹窗
   const dialog = reactive({
     title: "",
+    type: " ",// 'recharge', 'add', 'edit'
     visible: false,
   });
 
@@ -748,15 +799,30 @@
       dialog.title = "修改洗衣流程图片记录";
             AioveuLaundryProcessImageAPI.getFormData(id).then((data) => {
         Object.assign(formData, data);
+
+              // 根据已有的订单ID初始化过滤选项
+              if (formData.orderId) {
+                handleOrderChange(formData.orderId);
+              }
+
+        dialog.type = 'edit'; // 标记为编辑操作
               //先准备数据，再显示弹窗
               dialog.visible = true;
       });
     } else {
       dialog.title = "新增洗衣流程图片记录";
-      // 直接打开弹窗
-      dialog.visible = true;
-      // 重置清空表单
-      dataFormRef.value.resetFields();
+      dialog.type = 'add'; // 标记为新增操作
+
+      // 使用 nextTick 确保在 DOM 更新后重置表单
+      nextTick(() => {
+        if (dataFormRef.value) {
+          dataFormRef.value.resetFields();
+          dataFormRef.value.clearValidate();
+        }
+
+        // 打开弹窗
+        dialog.visible = true;
+      });
     }
   }
 
