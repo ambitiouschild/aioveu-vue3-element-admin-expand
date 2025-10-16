@@ -498,10 +498,16 @@
       });
     } else {
       dialog.title = "新增衣物类型";
-      // 直接打开弹窗
-      dialog.visible = true;
-      // 重置清空表单
-      dataFormRef.value.resetFields();
+      // 使用 nextTick 确保在 DOM 更新后重置表单
+      nextTick(() => {
+        if (dataFormRef.value) {
+          dataFormRef.value.resetFields();
+          dataFormRef.value.clearValidate();
+        }
+
+        // 打开弹窗
+        dialog.visible = true;
+      });
     }
   }
 

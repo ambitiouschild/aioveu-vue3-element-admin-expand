@@ -332,14 +332,30 @@
 
   /** 打开会员等级弹窗 */
   function handleOpenDialog(id?: number) {
-    dialog.visible = true;
+    // dialog.visible = true;
     if (id) {
       dialog.title = "修改会员等级";
             AioveuMemberLevelAPI.getFormData(id).then((data) => {
         Object.assign(formData, data);
+
+              //先准备数据，再显示弹窗
+              dialog.visible = true;
+
       });
     } else {
       dialog.title = "新增会员等级";
+
+      // 使用 nextTick 确保在 DOM 更新后重置表单
+      nextTick(() => {
+        if (dataFormRef.value) {
+          dataFormRef.value.resetFields();
+          dataFormRef.value.clearValidate();
+        }
+
+        // 打开弹窗
+        dialog.visible = true;
+      });
+
     }
   }
 

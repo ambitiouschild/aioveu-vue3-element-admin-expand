@@ -2,38 +2,95 @@
   <div class="app-container">
     <div class="search-container">
       <el-form ref="queryFormRef" :model="queryParams" :inline="true">
-                <el-form-item label="衣物唯一编码ID" prop="id">
-                      <el-input
-                          v-model="queryParams.id"
-                          placeholder="衣物唯一编码ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="衣物唯一编码ID" prop="id">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.id"-->
+<!--                          placeholder="衣物唯一编码ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+<!--                <el-form-item label="衣物唯一编码" prop="garmentCode">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.garmentCode"-->
+<!--                          placeholder="衣物唯一编码"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
                 <el-form-item label="衣物唯一编码" prop="garmentCode">
-                      <el-input
-                          v-model="queryParams.garmentCode"
-                          placeholder="衣物唯一编码"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+                  <el-select
+                    v-model="queryParams.garmentCode"
+                    placeholder="请选择衣物唯一编码"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in laundryGarmentIdentityOption"
+                      :key="item.id"
+                      :label="item.garmentCode"
+                      :value="item.id"
+                    />
+                  </el-select>
                 </el-form-item>
-                <el-form-item label="关联订单明细" prop="garmentOrderDetailId">
-                      <el-input
-                          v-model="queryParams.garmentOrderDetailId"
-                          placeholder="关联订单明细"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+
+<!--                <el-form-item label="关联订单明细" prop="garmentOrderDetailId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.garmentOrderDetailId"-->
+<!--                          placeholder="关联订单明细"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+
+
+                <el-form-item label="订单明细" prop="garmentOrderDetailId">
+                  <el-select
+                    v-model="queryParams.garmentOrderDetailId"
+                    placeholder="请选择订单明细"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in orderItemOption"
+                      :key="item.itemId"
+                      :label="item.problemDesc"
+                      :value="item.itemId"
+                    />
+                  </el-select>
                 </el-form-item>
+
+
+<!--                <el-form-item label="编码状态" prop="status">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.status"-->
+<!--                          placeholder="编码状态"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
                 <el-form-item label="编码状态" prop="status">
-                      <el-input
-                          v-model="queryParams.status"
-                          placeholder="编码状态"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+                  <el-select
+                    v-model="queryParams.status"
+                    placeholder="请选择编码状态"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in statusOptions"
+                      :key="Number(item.value)"
+                      :label="item.label"
+                      :value="Number(item.value)"
+                    />
+                  </el-select>
                 </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="handleQuery">
             <template #icon><Search /></template>
@@ -66,6 +123,16 @@
           <template #icon><Delete /></template>
           删除
         </el-button>
+
+        <el-button
+          v-hasPerm="['aioveuQRCode:aioveu-QRCode:scan']"
+          type="success"
+          @click="handQRCodeScan()"
+        >
+          <template #icon><Plus /></template>
+          扫码
+        </el-button>
+
       </div>
 
       <el-table
@@ -84,27 +151,85 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="garmentOrderDetailId"-->
+<!--                        label="关联订单明细"-->
+<!--                        prop="garmentOrderDetailId"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="garmentOrderDetailId"
-                        label="关联订单明细"
-                        prop="garmentOrderDetailId"
-                        min-width="150"
-                        align="center"
+                      key="itemProblemDesc"
+                      label="关联订单明细问题描述"
+                      prop="itemProblemDesc"
+                      min-width="150"
+                      align="center"
                     />
+
+<!--                    <el-table-column-->
+<!--                        key="qrCodePath"-->
+<!--                        label="二维码存储路径"-->
+<!--                        prop="qrCodePath"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+                        <!-- 修改后的图片列 -->
+                        <el-table-column
+                          key="qrCodePath"
+                          label="二维码图片"
+                          min-width="250"
+                          align="center"
+                        >
+                          <template #default="scope">
+                            <el-image
+                              style="width: 80px; height: 80px;"
+                              :src="scope.row.qrCodePath"
+                              :preview-src-list="[scope.row.qrCodePath]"
+                              fit="cover"
+                              lazy
+                              :scroll-container="'.el-table__body-wrapper'"
+                              :preview-teleported="true"
+                              hide-on-click-modal
+                            >
+                              <template #placeholder>
+                                <div class="image-loading">
+                                  <el-icon><Loading /></el-icon>
+                                </div>
+                              </template>
+                              <template #error>
+                                <div class="image-error">
+                                  <el-icon><Picture /></el-icon>
+                                  <span>加载失败</span>
+                                </div>
+                              </template>
+                            </el-image>
+                          </template>
+                        </el-table-column>
+
+
+
+
+
+
+<!--                    <el-table-column-->
+<!--                        key="status"-->
+<!--                        label="编码状态"-->
+<!--                        prop="status"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="qrCodePath"
-                        label="二维码存储路径"
-                        prop="qrCodePath"
-                        min-width="150"
-                        align="center"
-                    />
-                    <el-table-column
-                        key="status"
-                        label="编码状态"
-                        prop="status"
-                        min-width="150"
-                        align="center"
-                    />
+                      label="编码状态"
+                      min-width="150"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <DictLabel v-model="scope.row.status" code="laundry_garment_identity_status" />
+                      </template>
+                    </el-table-column>
+
                     <el-table-column
                         key="createTime"
                         label="创建时间"
@@ -227,12 +352,17 @@
 </template>
 
 <script setup lang="ts">
+
   defineOptions({
     name: "AioveuLaundryGarmentIdentity",
     inheritAttrs: false,
   });
 
-  import AioveuLaundryGarmentIdentityAPI, { AioveuLaundryGarmentIdentityPageVO, AioveuLaundryGarmentIdentityForm, AioveuLaundryGarmentIdentityPageQuery } from "@/api/aioveuLaundryGarmentIdentity/aioveu-laundry-garment-identity";
+  import AioveuLaundryGarmentIdentityAPI, { AioveuLaundryGarmentIdentityPageVO, AioveuLaundryGarmentIdentityForm, AioveuLaundryGarmentIdentityPageQuery ,AioveuGarmentIdentityOptionVO} from "@/api/aioveuLaundryGarmentIdentity/aioveu-laundry-garment-identity";
+  import AioveuLaundryOrderItemAPI, { AioveuLaundryOrderItemOption } from "@/api/aioveuLaundryOrderItem/aioveu-laundry-order-item"
+
+  // 导入字典值API
+  import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
 
   const queryFormRef = ref();
   const dataFormRef = ref();
@@ -240,6 +370,37 @@
   const loading = ref(false);
   const removeIds = ref<number[]>([]);
   const total = ref(0);
+
+  // 新增：选项
+  const laundryGarmentIdentityOption = ref<AioveuGarmentIdentityOptionVO[]>([]);
+
+  // 新增：选项
+  const orderItemOption = ref<AioveuLaundryOrderItemOption[]>([]);
+
+  // 字典选项
+  const statusOptions = ref<DictItemOption[]>([])
+
+
+  // 加载选项
+  function loadOptions() {
+
+    // 加载选项
+    AioveuLaundryGarmentIdentityAPI.getAllGarmentIdentityOptions().then(response => {
+      laundryGarmentIdentityOption.value = response
+    })
+
+    // 加载选项
+    AioveuLaundryOrderItemAPI.getAllLaundryOrderItemOptions().then(response => {
+      orderItemOption.value = response
+    })
+
+    // 加载字典
+    DictAPI.getDictItems('laundry_garment_identity_status').then(response => {
+      statusOptions.value = response
+    })
+
+  }
+
 
   const queryParams = reactive<AioveuLaundryGarmentIdentityPageQuery>({
     pageNum: 1,
@@ -291,14 +452,29 @@
 
   /** 打开衣物唯一编码弹窗 */
   function handleOpenDialog(id?: number) {
-    dialog.visible = true;
+    // dialog.visible = true;
     if (id) {
       dialog.title = "修改衣物唯一编码";
             AioveuLaundryGarmentIdentityAPI.getFormData(id).then((data) => {
         Object.assign(formData, data);
+
+              //先准备数据，再显示弹窗
+              dialog.visible = true;
+
       });
     } else {
       dialog.title = "新增衣物唯一编码";
+      // 使用 nextTick 确保在 DOM 更新后重置表单
+      nextTick(() => {
+        if (dataFormRef.value) {
+          dataFormRef.value.resetFields();
+          dataFormRef.value.clearValidate();
+        }
+
+        // 打开弹窗
+        dialog.visible = true;
+      });
+
     }
   }
 
@@ -367,5 +543,7 @@
 
   onMounted(() => {
     handleQuery();
+    //在 onMounted钩子中调用了 loadOptions()函数,确保函数被正确使用
+    loadOptions();
   });
 </script>

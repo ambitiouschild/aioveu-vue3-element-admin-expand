@@ -327,8 +327,18 @@
       });
     } else {
       dialog.title = "新增物资分类";
-      // 新增操作直接打开弹窗
-      dialog.visible = true;
+
+      // 使用 nextTick 确保在 DOM 更新后重置表单
+      nextTick(() => {
+        if (dataFormRef.value) {
+          dataFormRef.value.resetFields();
+          dataFormRef.value.clearValidate();
+        }
+
+        // 打开弹窗
+        dialog.visible = true;
+      });
+
     }
   }
 

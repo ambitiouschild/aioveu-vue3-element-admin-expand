@@ -237,20 +237,20 @@
                         min-width="150"
                         align="center"
                     />
-                    <el-table-column
-                        key="startTime"
-                        label="开始处理时间"
-                        prop="startTime"
-                        min-width="150"
-                        align="center"
-                    />
-                    <el-table-column
-                        key="endTime"
-                        label="完成处理时间"
-                        prop="endTime"
-                        min-width="150"
-                        align="center"
-                    />
+<!--                    <el-table-column-->
+<!--                        key="startTime"-->
+<!--                        label="开始处理时间"-->
+<!--                        prop="startTime"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+<!--                    <el-table-column-->
+<!--                        key="endTime"-->
+<!--                        label="完成处理时间"-->
+<!--                        prop="endTime"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
                     <el-table-column
                         key="createTime"
                         label="创建时间"
@@ -434,23 +434,23 @@
                       />
                 </el-form-item>
 
-                <el-form-item label="开始处理时间" prop="startTime">
-                      <el-date-picker
-                          v-model="formData.startTime"
-                          type="datetime"
-                          placeholder="开始处理时间"
-                          value-format="YYYY-MM-DD HH:mm:ss"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="开始处理时间" prop="startTime">-->
+<!--                      <el-date-picker-->
+<!--                          v-model="formData.startTime"-->
+<!--                          type="datetime"-->
+<!--                          placeholder="开始处理时间"-->
+<!--                          value-format="YYYY-MM-DD HH:mm:ss"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
-                <el-form-item label="完成处理时间" prop="endTime">
-                      <el-date-picker
-                          v-model="formData.endTime"
-                          type="datetime"
-                          placeholder="完成处理时间"
-                          value-format="YYYY-MM-DD HH:mm:ss"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="完成处理时间" prop="endTime">-->
+<!--                      <el-date-picker-->
+<!--                          v-model="formData.endTime"-->
+<!--                          type="datetime"-->
+<!--                          placeholder="完成处理时间"-->
+<!--                          value-format="YYYY-MM-DD HH:mm:ss"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
       </el-form>
       <template #footer>
@@ -578,10 +578,16 @@
     } else {
       dialog.title = "新增洗衣订单衣物明细";
       dialog.type = 'add'; // 标记为新增操作
-      // 直接打开弹窗
-      dialog.visible = true;
-      // 重置清空表单
-      dataFormRef.value.resetFields();
+      // 使用 nextTick 确保在 DOM 更新后重置表单
+      nextTick(() => {
+        if (dataFormRef.value) {
+          dataFormRef.value.resetFields();
+          dataFormRef.value.clearValidate();
+        }
+
+        // 打开弹窗
+        dialog.visible = true;
+      });
     }
   }
 

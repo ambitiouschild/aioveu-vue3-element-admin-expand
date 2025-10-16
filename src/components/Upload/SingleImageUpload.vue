@@ -21,17 +21,41 @@
 <!--      添加大图预览功能-->
 <!--      在使用 el-image组件的大图预览功能时，预览背景是空的（透明或白色），导致与底层内容重叠。这通常是由于预览模态框的背景样式问题导致的。-->
       <!-- 优化大图预览功能 -->
+<!--      1. v-if="modelValue"-->
+<!--      功能: 条件渲染指令-->
+<!--      作用: 当modelValue有值时（非空/非假值）才渲染该组件-->
+<!--      目的: 避免在没有图片URL时显示空白或错误区域-->
+<!--      2. :src="modelValue"-->
+<!--      功能: 绑定图片源属性-->
+<!--      作用: 将modelValue的值作为图片的URL-->
+<!--      目的: 显示指定URL的图片内容-->
+<!--      3. :preview-src-list="[modelValue]"-->
+<!--      功能: 设置预览图片列表-->
+<!--      作用: 接受一个数组作为预览图片集合-->
+<!--      目的: 这里只包含当前图片，表示点击后预览当前图片-->
+<!--      4. :preview-teleported="false"-->
+<!--      功能: 控制预览层的位置-->
+<!--      作用:-->
+<!--      true(默认): 预览层会附加到body元素-->
+<!--      false: 预览层保留在组件所在位置-->
+<!--      目的: 控制预览层在DOM中的位置-->
+<!--      5. hide-on-click-modal-->
+<!--      功能: 点击遮罩层关闭预览-->
+<!--      作用: 当用户点击预览时的黑色遮罩层时，自动关闭预览-->
+<!--      目的: 提供更便捷的预览关闭方式-->
       <el-image
         v-if="modelValue"
         :src="modelValue"
-        :preview-src-list="[modelValue]"
         :preview-teleported="true"
         hide-on-click-modal
         class="preview-image"
       />
+
+      <!--      删除按钮-->
       <el-icon v-if="modelValue" class="single-upload__delete-btn" @click.stop="handleDelete">
         <CircleCloseFilled />
       </el-icon>
+      <!--      添加按钮-->
       <el-icon v-else class="single-upload__add-btn">
         <Plus />
       </el-icon>

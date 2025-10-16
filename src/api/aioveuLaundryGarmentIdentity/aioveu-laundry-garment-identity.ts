@@ -61,7 +61,35 @@ const AioveuLaundryGarmentIdentityAPI = {
             url: `${AIOVEULAUNDRYGARMENTIDENTITY_BASE_URL}/${ids}`,
             method: "delete",
         });
-    }
+    },
+
+    /**
+     *  扫描二维码获取信息  前端摄像头扫描的实现
+     *
+     *  @param data 二维码扫描请求数据
+     */
+    scanQRCode(data: QRCodeScanRequest) {
+
+
+      return request({
+        url: `${AIOVEULAUNDRYGARMENTIDENTITY_BASE_URL}/scan`,
+        method: "post",
+        data,
+      });
+    },
+
+  /**
+   * 获取所有选项列表（用于下拉选择框）
+   * @returns 选项列表
+   * 因为request函数的类型定义允许第一个类型参数为any，从而绕过了类型检查
+   */
+  getAllGarmentIdentityOptions() {
+    return request<any,AioveuGarmentIdentityOptionVO[]>({
+      url: `${AIOVEULAUNDRYGARMENTIDENTITY_BASE_URL}/options`,
+      method: "get",
+    });
+  }
+
 }
 
 export default AioveuLaundryGarmentIdentityAPI;
@@ -112,4 +140,25 @@ export interface AioveuLaundryGarmentIdentityPageVO {
     createTime?: Date;
     /** 更新时间 */
     updateTime?: Date;
+}
+
+/**  二维码扫描请求数据 */
+export interface QRCodeScanRequest {
+
+  /** 二维码内容 （衣物唯一编码） */
+  qrContent?:  string;
+  /** 扫描者ID（操作员） */
+  scannerId?:  number;
+  /** 设备信息 */
+  deviceInfo?: string;
+  /** 扫描位置 */
+  location?:  string;
+}
+
+/** 选项VO（用于下拉选择框） */
+export interface AioveuGarmentIdentityOptionVO {
+  /** 衣物唯一编码ID */
+  id: number;
+  /** 衣物唯一编码(UUID格式) */
+  garmentCode: string;
 }
