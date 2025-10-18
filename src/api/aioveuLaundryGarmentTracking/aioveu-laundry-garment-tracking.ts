@@ -96,10 +96,6 @@ export interface AioveuLaundryGarmentTrackingForm {
     locationId?:  number;
     /** 备注 */
     remark?:  string;
-    /** 创建时间 */
-    createTime?:  Date;
-    /** 更新时间 */
-    updateTime?:  Date;
 }
 
 /** 衣物流转记录分页对象 */

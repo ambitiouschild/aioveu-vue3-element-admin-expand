@@ -1,0 +1,103 @@
+我们将在现有的衣物唯一编码管理页面中添加单个打印和批量打印功能。根据之前的后端设计，打印功能已经通过独立的打印服务实现，前端需要调用打印服务的接口。
+
+计划：
+
+在表格操作列中添加“打印”按钮，用于单个打印。
+
+在表格上方添加“批量打印”按钮，用于批量打印选中的衣物唯一编码。
+
+实现打印状态轮询和预览功能。
+
+注意：由于打印是异步任务，我们需要：
+
+提交打印任务
+
+轮询打印状态
+
+当打印任务完成时，打开预览页面
+
+步骤：
+
+添加打印相关按钮（单个打印和批量打印）
+
+实现打印任务提交和状态轮询
+
+实现预览页面（新页面或弹窗）
+
+由于打印任务可能包含多个二维码，我们将使用新页面展示打印内容，并调用浏览器打印功能。
+
+修改点：
+
+在操作列添加“打印”按钮
+
+在表格上方添加“批量打印”按钮
+
+添加打印状态轮询逻辑
+
+添加预览页面（这里使用新页面，路由为/print/preview/:printId）
+
+注意：由于打印服务已经提供了预览接口（/api/v1/aioveu-print/preview/{printId}），我们可以直接在新页面中嵌入这个HTML内容。
+
+具体实现：
+
+在操作列添加打印按钮：
+
+权限控制：v-hasPerm="['aioveuLaundryGarmentIdentity:aioveu-laundry-garment-identity:print']"
+
+点击事件：handlePrint(scope.row.id)
+
+在表格上方添加批量打印按钮：
+
+权限控制：v-hasPerm="['aioveuLaundryGarmentIdentity:aioveu-laundry-garment-identity:batchPrint']"
+
+点击事件：handleBatchPrint()
+
+实现打印方法：
+
+单个打印：调用打印服务的单个打印接口（/api/v1/aioveu-print/single）
+
+批量打印：调用打印服务的批量打印接口（/api/v1/aioveu-print/batch）
+
+轮询打印状态：
+
+使用setInterval轮询打印任务状态（/api/v1/aioveu-print/status/{printId}）
+
+当状态为COMPLETED时，打开预览页面
+
+当状态为FAILED时，提示用户
+
+预览页面：
+
+使用新路由/print/preview/:printId
+
+页面内调用打印服务的预览接口获取HTML内容并展示
+
+提供“打印”按钮调用浏览器的打印功能
+
+由于打印服务接口已经定义，我们主要在前端添加调用逻辑。
+
+注意：打印服务接口返回的预览URL（previewUrl）可以直接用作新页面的路由。
+
+
+
+
+在您的前端代码中，您不需要直接调用 getPrintPreview这个 API 方法，而是通过设置 iframe 的 src属性为后端提供的预览 URL 路径（例如 /api/v1/aioveu-print/preview/${printId}）来显示打印预览内容。
+
+为什么这样做？
+​后端渲染 HTML​：
+
+后端生成完整的 HTML 内容
+
+通过一个 URL 提供 HTML 内容
+
+​前端展示​：
+
+使用 iframe 加载这个 URL
+
+在对话框中显示 iframe
+
+​无需额外 API 调用​：
+
+不需要通过 AJAX 获取 HTML 内容
+
+直接使用 URL 即可
