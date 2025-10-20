@@ -11,6 +11,27 @@ const AioveuPrintAPI = {
       data,
     });
   },
+
+  /** 水洗唛打印 */
+  printCareLabel(data:AioveuPrintRequest) {
+    return request<any, AioveuPrintResponse> ({
+      url: `${AIOVEUPRINT_BASE_URL}/CareLabel`,
+      method: "post",
+      data,
+    });
+  },
+
+  /** 小票打印 */
+  printReceipt(data:AioveuPrintRequest) {
+    return request<any, AioveuPrintResponse> ({
+      url: `${AIOVEUPRINT_BASE_URL}/Receipt`,
+      method: "post",
+      data,
+    });
+  },
+
+
+
   /**
    * 批量二维码打印
 

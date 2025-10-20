@@ -141,7 +141,7 @@
           @click="handlePrintSingle()"
         >
           <template #icon><Printer /></template>
-          单个打印
+          单个二维码打印
         </el-button>
 
         <!-- 添加批量打印按钮 -->
@@ -153,7 +153,17 @@
           @click="handlePrintBatch"
         >
           <template #icon><Printer /></template>
-          批量打印
+          批量二维码打印
+        </el-button>
+
+        <!-- 添加水洗唛打印按钮 -->
+        <el-button
+          v-hasPerm="['aioveuPrint:aioveu-print:CareLabel']"
+          type="primary"
+          @click="handlePrintCareLabel()"
+        >
+          <template #icon><Printer /></template>
+          水洗唛批量打印
         </el-button>
 
       </div>
@@ -300,6 +310,18 @@
             >
               <template #icon><Printer /></template>
               单个打印
+            </el-button>
+
+            <!-- 添加水洗唛打印按钮 -->
+            <el-button
+              v-hasPerm="['aioveuPrint:aioveu-print:CareLabel']"
+              type="primary"
+              size="small"
+              link
+              @click="handlePrintSingleCareLabel(scope.row.garmentCode)"
+            >
+              <template #icon><Printer /></template>
+              水洗唛打印
             </el-button>
 
           </template>
@@ -476,7 +498,7 @@
     <!-- 打印预览对话框 -->
     <el-dialog
       v-model="printPreviewVisible"
-      title="打印预览"
+      :title="printPreviewTitle"
       width="80%"
       top="5vh"
       destroy-on-close
@@ -484,9 +506,14 @@
 
       <!-- 在打印预览对话框中添加配置选项 -->
       <div class="print-config">
-        <el-form :inline="true">
+        <el-form :inline="true" label-width="100px">
+
+          <!-- 通用配置 -->
           <el-form-item label="份数">
-            <el-input-number v-model="copies" :min="1" :max="10" />
+            <el-input-number
+              v-model="copies"
+              :min="1"
+              :max="10" />
           </el-form-item>
           <el-form-item label="纸张大小">
             <el-select v-model="paperSize">
@@ -504,6 +531,21 @@
           <el-form-item label="显示信息">
             <el-switch v-model="showInfo" />
           </el-form-item>
+
+          <!-- 水洗唛特有配置 -->
+          <el-form-item label="显示洗涤图标" v-if="currentPrintType === 'CARE_LABEL'">
+            <el-switch v-model="showWashingSymbols" />
+          </el-form-item>
+
+          <el-form-item label="显示材质成分" v-if="currentPrintType === 'CARE_LABEL'">
+            <el-switch v-model="showMaterial" />
+          </el-form-item>
+
+          <el-form-item label="显示原产国" v-if="currentPrintType === 'CARE_LABEL'">
+            <el-switch v-model="showCountryOfOrigin" />
+          </el-form-item>
+
+
         </el-form>
       </div>
 
@@ -514,6 +556,34 @@
           class="print-preview-frame"
           frameborder="0"
         ></iframe>
+
+        <!-- 添加水洗唛预览占位符 -->
+        <div v-else-if="currentPrintType === 'CARE_LABEL'" class="care-label-preview-placeholder">
+          <div class="care-label-preview">
+            <div class="care-label-header">
+              <div class="care-logo">LOGO</div>
+              <div class="brand-name">品牌名称</div>
+            </div>
+
+            <div class="care-content">
+              <div class="material"><strong>成分:</strong> 100%棉</div>
+              <div class="symbols">
+                <span>🛁30</span>
+                <span>🚫△</span>
+                <span>♨️·</span>
+              </div>
+              <div class="instructions">最高洗涤温度30度，不可漂白，中温熨烫，不可干洗，悬挂晾干</div>
+            </div>
+
+            <div class="origin">产地: 中国</div>
+          </div>
+        </div>
+
+
+
+
+
+
         <div v-else class="print-preview-loading">
           <el-icon class="is-loading"><Loading /></el-icon>
           <span>加载预览中...</span>
@@ -576,6 +646,12 @@
   // 存储当前打印任务ID
   const currentPrintId = ref<string>('');
 
+  // 水洗唛特有配置
+  const showWashingSymbols = ref(true);
+  const showMaterial = ref(true);
+  const showCountryOfOrigin = ref(true);
+  const currentPrintType = ref(''); // 当前打印类型
+
   // 计算属性：检查当前任务状态是否为 GENERATED
   const isPreviewReady  = computed(() => {
     if (!currentPrintId.value) return false;
@@ -602,6 +678,18 @@
     return statusMap[status] || status;
   };
 
+  // 计算打印预览标题
+  const printPreviewTitle = computed(() => {
+    if (currentPrintType.value === 'QR_CODE') {
+      return '二维码打印预览';
+    } else if (currentPrintType.value === 'RECEIPT') {
+      return '小票打印预览';
+    } else if (currentPrintType.value === 'CARE_LABEL') {
+      return '水洗唛打印预览';
+    }
+    return '打印预览';
+  });
+
   // 定义 Element Plus 标签类型  Element Plus 的 el-tag组件有一个严格类型的 type属性
   type TagType = 'success' | 'primary' | 'warning' | 'info' | 'danger';
 
@@ -626,6 +714,7 @@
   // 单个打印
   const handlePrintSingle = ( garmentCode ?: string) => {
     let code: string | undefined;
+
     console.log("开始单个打印");
     if (garmentCode) {
       // 如果传入了 garmentCode，直接使用
@@ -644,6 +733,7 @@
     const request = {
       qrCode: code,
       template: "standard", // 使用标准模板
+      printType: "QR_CODE",
       copies: copies.value,
       paperSize: paperSize.value,
       orientation: orientation.value,
@@ -662,6 +752,9 @@
           printPreviewUrl.value = response.previewUrl;
           console.log("打印预览访问:", printPreviewUrl.value);
           console.log("任务ID:", response.printId);
+
+          currentPrintType.value = request.printType;
+
           // 在打印方法中添加到任务列表
           printJobs.value.push({
             printId: response.printId,
@@ -685,6 +778,106 @@
       });
   };
 
+
+  // 水洗唛打印
+  const handlePrintCareLabel = () => {
+    if (selectedRows.value.length === 0) {
+      ElMessage.warning("请选择要打印的记录");
+      return;
+    }
+
+    // 提取 garmentCode
+    const qrCodes = selectedRows.value.map(row => row.garmentCode);
+
+    // 在打印请求中添加配置
+    const request = {
+      qrCodes: qrCodes,
+      printType: "CARE_LABEL", // 指定打印类型为水洗唛
+      template: "care_label", // 使用水洗唛模板
+      copies: copies.value,
+      paperSize: paperSize.value,
+      orientation: orientation.value,
+      showInfo: showInfo.value
+    };
+
+    printPreviewVisible.value = true;
+    printPreviewUrl.value = "";
+
+    AioveuPrintAPI.printCareLabel(request)
+      .then(response => {
+        if (response.success) {
+          printPreviewUrl.value = response.previewUrl;
+
+          // 添加到任务列表
+          printJobs.value.push({
+            printId: response.printId,
+            status: 'PENDING',
+            total: qrCodes.length,
+            createTime: new Date().toLocaleString()
+          });
+          startPrintStatusPolling(response.printId);
+
+          // 调用预览方法
+          viewPrintPreview(response.printId);
+
+        } else {
+          ElMessage.error(`水洗唛打印失败: ${response.message}`);
+          printPreviewVisible.value = false;
+        }
+      })
+      .catch(error => {
+        ElMessage.error(`请求失败: ${error.message}`);
+        printPreviewVisible.value = false;
+      });
+  };
+
+  // 单个水洗唛打印（操作列中的按钮）
+  const handlePrintSingleCareLabel = (garmentCode: string) => {
+    // 在打印请求中添加配置
+    const request = {
+      qrCodes: [garmentCode],
+      printType: "CARE_LABEL", // 指定打印类型为水洗唛
+      template: "care_label", // 使用水洗唛模板
+      copies: copies.value,
+      paperSize: paperSize.value,
+      orientation: orientation.value,
+      showInfo: showInfo.value
+    };
+
+    printPreviewVisible.value = true;
+    printPreviewUrl.value = "";
+
+    AioveuPrintAPI.printCareLabel(request)
+      .then(response => {
+        if (response.success) {
+          printPreviewUrl.value = response.previewUrl;
+
+          // 添加到任务列表
+          printJobs.value.push({
+            printId: response.printId,
+            status: 'PENDING',
+            total: 1,
+            createTime: new Date().toLocaleString()
+          });
+          startPrintStatusPolling(response.printId);
+
+          // 调用预览方法
+          viewPrintPreview(response.printId);
+
+        } else {
+          ElMessage.error(`水洗唛打印失败: ${response.message}`);
+          printPreviewVisible.value = false;
+        }
+      })
+      .catch(error => {
+        ElMessage.error(`请求失败: ${error.message}`);
+        printPreviewVisible.value = false;
+      });
+  };
+
+
+
+
   // 批量打印
   const handlePrintBatch = () => {
     if (selectedRows.value.length === 0) {
@@ -698,6 +891,7 @@
     // 在打印请求中添加配置
     const request = {
       qrCodes: aqrCodes,
+      printType: "QR_CODE",
       template: "batch", // 使用批量模板
       copies: copies.value,
       paperSize: paperSize.value,
@@ -779,6 +973,13 @@
                 clearInterval(timer);
                 pollingTimers.delete(printId);
                 ElMessage.error("打印任务失败");
+              }else if (status.aioveuPrintStatus === 'COMPLETED') {
+
+                // // 如果任务完成，停止轮询
+                clearInterval(timer);
+                pollingTimers.delete(printId);
+                ElMessage.error("打印任务完成");
+
               }
 
             }
@@ -845,44 +1046,44 @@
 
       printPreviewUrl.value = blobUrl;
 
-      // 在 iframe 加载完成后检查内容
-      const iframe = document.querySelector('.print-preview-frame') as HTMLIFrameElement;
-      if (iframe) {
-        iframe.onload = () => {
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-          if (iframeDoc) {
-            const bodyContent = iframeDoc.body.innerHTML;
-
-            // 检查是否是预览内容
-            const isPreviewContent = bodyContent.includes('衣物二维码') ||
-              bodyContent.includes('garmentCode');
-
-            if (!isPreviewContent) {
-              console.error("返回了非预览内容:", bodyContent.substring(0, 500));
-
-              // 检查是否是登录页
-              if (bodyContent.includes('登录') || bodyContent.includes('login')) {
-                ElMessage.error("认证过期，请重新登录");
-                // router.push('/login');
-              }
-              // 检查是否是首页
-              else if (bodyContent.includes('首页') || bodyContent.includes('dashboard')) {
-                ElMessage.error("后端返回了首页内容，请检查预览接口实现");
-              }
-              // 检查是否是错误页
-              else if (bodyContent.includes('error') || bodyContent.includes('错误')) {
-                ElMessage.error("后端返回了错误页面");
-              }
-              else {
-                ElMessage.error("获取预览失败，返回了非预览内容");
-              }
-
-              // 不再关闭弹窗
-              // printPreviewVisible.value = false;
-            }
-          }
-        };
-      }
+      // // 在 iframe 加载完成后检查内容
+      // const iframe = document.querySelector('.print-preview-frame') as HTMLIFrameElement;
+      // if (iframe) {
+      //   iframe.onload = () => {
+      //     const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      //     if (iframeDoc) {
+      //       const bodyContent = iframeDoc.body.innerHTML;
+      //
+      //       // 检查是否是预览内容
+      //       const isPreviewContent = bodyContent.includes('衣物二维码') ||
+      //         bodyContent.includes('garmentCode');
+      //
+      //       if (!isPreviewContent) {
+      //         console.error("返回了非预览内容:", bodyContent.substring(0, 500));
+      //
+      //         // 检查是否是登录页
+      //         if (bodyContent.includes('登录') || bodyContent.includes('login')) {
+      //           ElMessage.error("认证过期，请重新登录");
+      //           // router.push('/login');
+      //         }
+      //         // 检查是否是首页
+      //         else if (bodyContent.includes('首页') || bodyContent.includes('dashboard')) {
+      //           ElMessage.error("后端返回了首页内容，请检查预览接口实现");
+      //         }
+      //         // 检查是否是错误页
+      //         else if (bodyContent.includes('error') || bodyContent.includes('错误')) {
+      //           ElMessage.error("后端返回了错误页面");
+      //         }
+      //         else {
+      //           ElMessage.error("获取预览失败，返回了非预览内容");
+      //         }
+      //
+      //         // 不再关闭弹窗
+      //         // printPreviewVisible.value = false;
+      //       }
+      //     }
+      //   };
+      // }
 
     } catch (error:any) {
       console.error('加载预览失败', error);
@@ -975,9 +1176,9 @@
         .then(() => {  // 移除 response 参数
 
           // 后端接口已完成更新任务状态为已打印
-          // if (jobIndex !== -1) {
-          //   printJobs.value[jobIndex].status = 'PRINTED';
-          // }
+          if (jobIndex !== -1) {
+            printJobs.value[jobIndex].status = 'COMPLETED';
+          }
 
           ElMessage.success("打印成功");
         })
@@ -1248,6 +1449,69 @@
   margin-top: 10px;
   font-size: 14px;
   color: #606266;
+}
+
+
+/* 水洗唛打印预览样式 */
+.care-label-preview {
+  font-family: Arial, sans-serif;
+  width: 80mm;
+  height: 50mm;
+  border: 1px solid #ccc;
+  padding: 5mm;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.care-label-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3mm;
+}
+
+.care-logo {
+  width: 15mm;
+  height: 15mm;
+  margin-right: 3mm;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.brand-name {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.care-content {
+  margin-bottom: 2mm;
+}
+
+.material {
+  margin-bottom: 1mm;
+  font-size: 10px;
+}
+
+.symbols {
+  display: flex;
+  gap: 2mm;
+  margin: 2mm 0;
+  font-size: 14px;
+}
+
+.instructions {
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.origin {
+  position: absolute;
+  bottom: 2mm;
+  right: 3mm;
+  font-size: 9px;
 }
 
 

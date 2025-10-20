@@ -102,6 +102,8 @@ export interface AioveuLaundryOrderPageQuery extends PageQuery {
     status?: number;
     /** 支付状态 1-未支付-unpaid,2-部分支付-partial,3-已支付-paid,4-未支付-refunded */
     paymentStatus?: number;
+
+  paymentMethodId?: number;
 }
 
 /** 洗衣订单表单对象 */
