@@ -457,7 +457,7 @@
 
   // 会员信息管理表单校验规则
   const rules = reactive({
-                      memberNo: [{ required: true, message: "请输入会员卡号", trigger: "blur" }],
+                      // memberNo: [{ required: true, message: "请输入会员卡号", trigger: "blur" }],
                       name: [{ required: true, message: "请输入会员姓名", trigger: "blur" }],
                       phone: [{ required: true, message: "请输入手机号", trigger: "blur" }],
                       levelId: [{ required: true, message: "请输入会员等级", trigger: "blur" }],
