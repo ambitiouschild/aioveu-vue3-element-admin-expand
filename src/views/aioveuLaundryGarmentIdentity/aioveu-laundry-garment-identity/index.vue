@@ -124,11 +124,11 @@
           删除
         </el-button>
 
-        <!-- 添加扫码按钮 -->
+<!--        &lt;!&ndash; 添加扫码按钮 &ndash;&gt;           @click="handQRCodeScan()"-->
         <el-button
           v-hasPerm="['aioveuQRCode:aioveu-QRCode:scan']"
           type="success"
-          @click="handQRCodeScan()"
+
         >
           <template #icon><Plus /></template>
           扫码
@@ -1012,9 +1012,14 @@
       printPreviewUrl.value = "";
 
 
-      // 获取基础 URL
-      const baseURL = import.meta.env.VITE_APP_API_URL;
-      const url = `${baseURL}/api/v1/aioveu-print/preview/${printId}`;
+
+
+      // 获取基础 URL  // 获取基础 URL - 添加默认值
+      // const baseURL = import.meta.env.VITE_APP_API_URL || 'http://localhost:8888';
+      // const url = `${baseURL}/api/v1/aioveu-print/preview/${printId}`;
+
+      // 使用相对路径（推荐）
+      const url = `/prod-api/api/v1/aioveu-print/preview/${printId}`;
       console.log("请求预览URL:", url);
 
 

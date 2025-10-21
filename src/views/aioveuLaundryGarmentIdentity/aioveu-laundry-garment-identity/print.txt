@@ -101,3 +101,70 @@
 不需要通过 AJAX 获取 HTML 内容
 
 直接使用 URL 即可
+
+
+这个请求通过Nginx反向代理转发到后端服务。以下是详细过程：
+
+前端发起请求：/api/v1/aioveu-print/preview/${printId}
+
+Nginx配置中，如果配置了匹配/api/的location，则会将请求转发到后端服务
+
+但是，您之前的Nginx配置是：
+
+location /prod-api/ {
+
+proxy_pass http://v1.3.2-aioveu-boot:8989/;
+
+}
+
+而前端请求的路径是/api/...，所以需要确保Nginx有匹配/api/的配置。
+
+解决方案：
+
+方案一：修改前端请求路径，使用/prod-api/作为前缀
+
+const url = /prod-api/v1/aioveu-print/preview/${printId};
+
+方案二：修改Nginx配置，添加对/api/的代理
+
+推荐方案二，因为您的前端代码已经使用了/api/前缀。
+
+修改Nginx配置，添加：
+
+location /api/ {
+    proxy_pass http://v1.3.2-aioveu-boot:8989/;
+    # 其他配置...
+}
+这样，当前端请求/api/v1/aioveu-print/preview/PRINT202510210009时，Nginx会将其转发到后端的/v1/aioveu-print/preview/PRINT202510210009（注意：因为proxy_pass后面有斜杠，所以会去掉匹配的前缀/api）。
+
+如果后端服务的接口路径是/api/v1/...，那么需要调整proxy_pass：
+
+location /api/ {
+    proxy_pass http://v1.3.2-aioveu-boot:8989/api/;
+}
+这样，请求/api/v1/...会被转发到后端的/api/v1/...。
+
+请根据您的后端实际接口路径调整。
+
+另外，确保在Nginx配置中传递了必要的头部，特别是Authorization头，因为您使用了token认证：
+
+location /api/ {
+    proxy_pass http://v1.3.2-aioveu-boot:8989/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Authorization $http_authorization;   # 传递Authorization头
+    # 其他配置...
+}
+这样，后端服务就能收到前端发送的Authorization头。
+
+总结步骤：
+
+在Nginx配置中添加或修改location块，匹配/api/路径，并正确代理到后端服务。
+
+确保传递了Authorization头。
+
+重启Nginx使配置生效。
+
+这样，前端的请求就能通过Nginx代理到达后端服务了。
