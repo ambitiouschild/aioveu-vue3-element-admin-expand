@@ -21,8 +21,21 @@ const pathSrc = resolve(__dirname, "src");
 
 // Vite配置  https://cn.vitejs.dev/config
 export default defineConfig(({ mode }: ConfigEnv) => {
-  const env = loadEnv(mode, process.cwd());
-  const isProduction = mode === "production";
+
+  // 根据当前模式加载环境变量
+  //这样配置后，Vite会根据您运行的命令自动加载对应的环境变量文件，确保开发、测试、生产环境使用正确的API配置。
+  //Vite会根据启动命令自动区分开发（dev）和构建（prod）模式。在Vite中，模式（mode）是通过命令行指定的
+  //在您的配置中，您已经通过 defineConfig的函数形式获取了 mode，并根据它加载了对应的环境变量。这样，您就可以根据不同的模式使用不同的配置。
+  //这样，当您以开发模式启动时，Vite会加载 .env.development中的变量；当您构建生产版本时，会加载 .env.production中的变量。
+  //您还在配置中使用了 isProduction变量来根据模式设置不同的构建选项（如压缩和去除console等），这进一步利用了模式的区别。
+  //启动命令                             模式（mode）   说明
+  // vite或 npm run dev               development   开发模式
+  //vite build或 npm run build        production    生产模式
+  //vite --mode test                  test         测试模式
+
+  //您的配置已经正确实现了根据启动命令自动区分开发和生产模式。Vite 的 mode参数会准确反映您运行的命令，从而加载对应的环境变量文件和配置。
+  const env = loadEnv(mode, process.cwd());     // 加载对应模式的环境变量   Vite 会根据 mode自动加载对应的环境变量文件
+  const isProduction = mode === "production";              // 判断是否为生产模式
 
   return {
     resolve: {
@@ -39,17 +52,34 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         },
       },
     },
+    //Vite服务器的配置，目的是在开发时代理某些API请求到线上后端接口
+    //根据当前模式加载环境变量
     server: {
-      host: "0.0.0.0",
-      port: +env.VITE_APP_PORT,
-      open: true,
+      // 开发模式才启用代理和自动打开浏览器
+      host: "0.0.0.0",  //服务器主机设置为"0.0.0.0"以便可以通过本地IP访问（例如同一局域网内的设备访问）
+      port: +env.VITE_APP_PORT, //端口来自环境变量VITE_APP_PORT，并使用+转换为数字
+      open: true,            //设置open: true，表示启动服务器时自动打开浏览器    // 生产模式不自动打开浏览器
       proxy: {
+        // 只在开发模式配置代理
         // 代理 /dev-api 的请求
-        [env.VITE_APP_BASE_API]: {
-          changeOrigin: true,
+        [env.VITE_APP_BASE_API]: {       //代理配置中，我们使用一个动态的键（来自环境变量VITE_APP_BASE_API）作为要代理的路径前缀。 例如，如果VITE_APP_BASE_API是"/dev-api"，那么所有以/dev-api开头的请求都会被代理。
+          changeOrigin: true,            //changeOrigin: true，改变请求头中的host为目标URL的host，用于解决跨域问题。
           // 代理目标地址：https://api.youlai.tech
-          target: env.VITE_APP_API_URL,
+          target: env.VITE_APP_API_URL,       //target: 代理的目标地址，来自环境变量VITE_APP_API_URL，例如"https://api.aioveu.com
+          //rewrite: 重写路径，这里使用一个函数，将路径中的VITE_APP_BASE_API部分替换为空字符串。
+
+          //1.计算机A - Vite 配置, rewrite，去除/dev-api ，因为计算机B的Nginx已经去除处理路径/dev-api
+          //例如，请求路径为"/dev-api/user"，经过重写后变成"/user"，然后会与目标地址拼接成"https://api.aioveu.com/user
           rewrite: (path) => path.replace(new RegExp("^" + env.VITE_APP_BASE_API), ""),
+
+          //2. 计算机A - Vite 配置, 不需要rewrite，保留/dev-api ，因为计算机B的Nginx已经处理路径/dev-api
+          //rewrite: (path) => path, // 保持原路径
+
+          secure: false, // 如果是HTTPS且证书不受信任
+
+          //跨域问题: 代理配置解决了开发时的跨域问题
+          //计算机A（前端开发） -> 请求发送到计算机B的Nginx（计算机B的域名或IP）的/dev-api -> 计算机B的Nginx将请求代理到本地后端服务（127.0.0.1:8989）
+          //修改计算机A的Vite配置，将target设置为计算机B的域名或IP（包括端口，如果Nginx监听的是80或443则端口可以省略），并且不要重写路径（或者重写路径为/dev-api，因为计算机B的Nginx需要这个路径）。
         },
       },
     },
@@ -191,6 +221,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     // 构建配置
     build: {
       chunkSizeWarningLimit: 2000, // 消除打包大小超过500kb警告
+      // 生产模式才启用压缩和优化
       minify: isProduction ? "terser" : false, // 只在生产环境启用压缩
       terserOptions: isProduction
         ? {
